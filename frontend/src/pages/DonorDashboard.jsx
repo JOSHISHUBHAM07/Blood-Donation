@@ -1,0 +1,275 @@
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import {
+    Heart, Calendar, CheckCircle2, AlertCircle, Clock, Loader2,
+    ToggleLeft, ToggleRight, Plus, X, MapPin
+} from 'lucide-react';
+import {
+    fetchAssignedRequests, fetchDonationHistory,
+    scheduleDonation, completeDonation, updateAvailability, resetDonor
+} from '../features/donor/donorSlice';
+import SkeletonLoader from '../components/SkeletonLoader';
+
+const statusColors = {
+    Scheduled: 'bg-blue-100 text-blue-700',
+    Completed: 'bg-emerald-100 text-emerald-700',
+    Cancelled: 'bg-gray-100 text-gray-600',
+};
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 24 },
+    show: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] } }),
+};
+
+export default function DonorDashboard() {
+    const dispatch = useDispatch();
+    const { user } = useSelector(s => s.auth);
+    const { assignedRequests, donations, isLoading, isError, isSuccess, message } = useSelector(s => s.donor);
+
+    const [activeTab, setActiveTab] = useState('history');
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
+    const [available, setAvailable] = useState(user?.isAvailable ?? true);
+    const [form, setForm] = useState({ date: '', location: '', units: 1, medicalClearance: false });
+
+    useEffect(() => {
+        dispatch(fetchAssignedRequests());
+        dispatch(fetchDonationHistory());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (isError) { toast.error(message); dispatch(resetDonor()); }
+        if (isSuccess && !isLoading) {
+            toast.success('Done!');
+            setShowScheduleModal(false);
+            dispatch(resetDonor());
+            dispatch(fetchDonationHistory());
+        }
+    }, [isError, isSuccess, message, isLoading, dispatch]);
+
+    const handleToggleAvailability = () => {
+        const newVal = !available;
+        setAvailable(newVal);
+        dispatch(updateAvailability(newVal)).then(() =>
+            toast.success(`You are now ${newVal ? 'available' : 'unavailable'} for donation`)
+        );
+    };
+
+    const handleComplete = (id) => {
+        if (window.confirm('Mark this donation as completed?')) {
+            dispatch(completeDonation(id)).then((res) => {
+                if (!res.error) toast.success('Donation completed! Blood stock updated.');
+                else toast.error(res.payload);
+            });
+        }
+    };
+
+    const handleSchedule = (e) => {
+        e.preventDefault();
+        if (!form.date || !form.location) { toast.error('Fill all required fields'); return; }
+        dispatch(scheduleDonation(form));
+    };
+
+    const stats = {
+        total: donations.length,
+        completed: donations.filter(d => d.status === 'Completed').length,
+        scheduled: donations.filter(d => d.status === 'Scheduled').length,
+        assigned: assignedRequests.length,
+    };
+
+    return (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-6xl mx-auto">
+            {/* Header */}
+            <motion.div variants={cardVariants} custom={0} initial="hidden" animate="show" className="mb-8">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
+                            <Heart className="w-5 h-5 text-white fill-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-extrabold text-gray-900">Donor Dashboard</h1>
+                            <p className="text-gray-500 text-sm">Blood group: <span className="font-bold text-rose-600">{user?.bloodGroup || '—'}</span></p>
+                        </div>
+                    </div>
+                    {/* Availability Toggle */}
+                    <button onClick={handleToggleAvailability}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm border-2 transition-all ${available ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
+                        {available ? <ToggleRight className="w-5 h-5 text-emerald-500" /> : <ToggleLeft className="w-5 h-5 text-gray-400" />}
+                        {available ? 'Available' : 'Unavailable'}
+                    </button>
+                </div>
+            </motion.div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[
+                    { label: 'Total Donations', value: stats.total, icon: Heart, color: 'from-rose-500 to-pink-500' },
+                    { label: 'Completed', value: stats.completed, icon: CheckCircle2, color: 'from-emerald-500 to-green-500' },
+                    { label: 'Scheduled', value: stats.scheduled, icon: Clock, color: 'from-blue-500 to-blue-600' },
+                    { label: 'Assigned Requests', value: stats.assigned, icon: AlertCircle, color: 'from-purple-500 to-purple-600' },
+                ].map((s, i) => (
+                    <motion.div key={i} variants={cardVariants} custom={i} initial="hidden" animate="show"
+                        className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-3 shadow`}>
+                            <s.icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-2xl font-extrabold text-gray-900">{s.value}</div>
+                        <div className="text-xs text-gray-500 font-medium mt-0.5">{s.label}</div>
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit flex-wrap">
+                {['history', 'assigned'].map(tab => (
+                    <button key={tab} onClick={() => setActiveTab(tab)}
+                        className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                        {tab === 'history' ? '💉 Donation History' : '📋 Assigned Requests'}
+                    </button>
+                ))}
+            </div>
+
+            {/* Donation History */}
+            {activeTab === 'history' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-bold text-gray-800">Donation History</h2>
+                        <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                            onClick={() => setShowScheduleModal(true)}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all">
+                            <Plus className="w-4 h-4" /> Schedule Donation
+                        </motion.button>
+                    </div>
+
+                    {isLoading ? (
+                        <div className="mt-4"><SkeletonLoader type="card" count={3} /></div>
+                    ) : donations.length === 0 ? (
+                        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
+                            <Heart className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                            <p className="text-gray-400 font-medium">No donations scheduled yet</p>
+                            <button onClick={() => setShowScheduleModal(true)} className="mt-4 text-rose-500 font-semibold text-sm hover:underline">+ Schedule your first donation</button>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {donations.map((d, i) => (
+                                <motion.div key={d._id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all flex flex-wrap items-center justify-between gap-3">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm ${d.status === 'Completed' ? 'bg-emerald-50' : 'bg-blue-50'}`}>
+                                            {d.status === 'Completed' ? '✅' : '💉'}
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-gray-800 flex items-center gap-2">
+                                                {new Date(d.date).toLocaleDateString()}
+                                                <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${statusColors[d.status] || 'bg-gray-100 text-gray-600'}`}>{d.status}</span>
+                                            </div>
+                                            <div className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
+                                                <MapPin className="w-3.5 h-3.5" /> {d.location} · {d.units} unit(s)
+                                            </div>
+                                            {d.medicalClearance && <span className="text-xs text-emerald-600 font-medium">✓ Medical Clearance</span>}
+                                        </div>
+                                    </div>
+                                    {d.status === 'Scheduled' && (
+                                        <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                            onClick={() => handleComplete(d._id)}
+                                            className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors shadow-sm">
+                                            Mark Complete
+                                        </motion.button>
+                                    )}
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </motion.div>
+            )}
+
+            {/* Assigned Requests */}
+            {activeTab === 'assigned' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <h2 className="text-lg font-bold text-gray-800 mb-4">Assigned Blood Requests</h2>
+                    {assignedRequests.length === 0 ? (
+                        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
+                            <AlertCircle className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                            <p className="text-gray-400 font-medium">No requests assigned yet</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {assignedRequests.map((req, i) => (
+                                <motion.div key={req._id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all">
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white font-extrabold text-lg shadow">
+                                                {req.bloodGroup}
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-gray-800">{req.hospital}</div>
+                                                <div className="text-sm text-gray-500">{req.quantity} unit(s) · Needed by {new Date(req.requiredDate).toLocaleDateString()}</div>
+                                            </div>
+                                        </div>
+                                        <span className={`px-3 py-1 rounded-lg text-xs font-bold ${req.emergencyLevel === 'Critical' ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-orange-100 text-orange-700'}`}>
+                                            {req.emergencyLevel}
+                                        </span>
+                                    </div>
+                                    {req.patientId && (
+                                        <div className="mt-3 text-sm text-blue-700 bg-blue-50 rounded-xl px-3 py-2">
+                                            Patient: <strong>{req.patientId.name}</strong> · {req.patientId.contact}
+                                        </div>
+                                    )}
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </motion.div>
+            )}
+
+            {/* Schedule Donation Modal */}
+            <AnimatePresence>
+                {showScheduleModal && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+                        onClick={e => e.target === e.currentTarget && setShowScheduleModal(false)}>
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+                            <div className="bg-gradient-to-r from-rose-500 to-pink-600 p-6 flex justify-between items-center">
+                                <h3 className="text-xl font-extrabold text-white">Schedule Donation</h3>
+                                <button onClick={() => setShowScheduleModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <form onSubmit={handleSchedule} className="p-6 space-y-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Donation Date *</label>
+                                    <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Location *</label>
+                                    <input type="text" value={form.location} placeholder="e.g. City Blood Bank" onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+                                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Units *</label>
+                                    <input type="number" min="1" value={form.units} onChange={e => setForm(f => ({ ...f, units: +e.target.value }))}
+                                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 outline-none" />
+                                </div>
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" checked={form.medicalClearance} onChange={e => setForm(f => ({ ...f, medicalClearance: e.target.checked }))}
+                                        className="w-4 h-4 accent-rose-500" />
+                                    <span className="text-sm font-medium text-gray-700">Medical Clearance Obtained</span>
+                                </label>
+                                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={isLoading}
+                                    className="w-full py-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+                                    {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : '💉 Schedule Donation'}
+                                </motion.button>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    );
+}
