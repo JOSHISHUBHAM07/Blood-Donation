@@ -14,8 +14,11 @@ const app = express();
 app.use(helmet());
 
 // CORS — allow frontend origin
+const rawClientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+const clientUrl = rawClientUrl.startsWith('http') ? rawClientUrl : `https://${rawClientUrl}`;
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: clientUrl,
   credentials: true,
 }));
 
