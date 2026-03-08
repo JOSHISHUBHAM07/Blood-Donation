@@ -137,7 +137,7 @@ export default function PatientDashboard() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+            <div className="flex flex-wrap gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
                 {['requests', 'blood-availability'].map(tab => (
                     <button
                         key={tab}

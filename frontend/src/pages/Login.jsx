@@ -48,7 +48,7 @@ const Login = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="min-h-[85vh] flex items-center justify-center relative z-10 px-4 py-10"
+            className="min-h-[85vh] flex items-center justify-center relative z-10 px-4 py-6 md:py-10"
         >
             <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-white/40">
 
@@ -89,8 +89,8 @@ const Login = () => {
                 </div>
 
                 {/* Right — Form Panel */}
-                <div className="bg-white/80 backdrop-blur-xl p-10 flex flex-col justify-center">
-                    <div className="mb-8">
+                <div className="bg-white/80 backdrop-blur-xl p-6 md:p-10 flex flex-col justify-center">
+                    <div className="mb-6 md:mb-8">
                         <span className="text-4xl mb-3 inline-block">🩸</span>
                         <h2 className="text-2xl font-extrabold text-gray-800 tracking-tight">Sign In</h2>
                         <p className="text-gray-500 mt-1 text-sm">Enter your credentials to continue</p>
@@ -103,7 +103,7 @@ const Login = () => {
                         </div>
                     )}
 
-                    <form onSubmit={onSubmit} className="space-y-5">
+                    <form onSubmit={onSubmit} className="space-y-4 md:space-y-5">
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
                             <div className="relative">
@@ -115,7 +115,7 @@ const Login = () => {
                                     onChange={onChange}
                                     placeholder="you@example.com"
                                     required
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
                                 />
                             </div>
                         </div>
@@ -130,7 +130,7 @@ const Login = () => {
                                     onChange={onChange}
                                     placeholder="••••••••"
                                     required
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
                                 />
                             </div>
                         </div>
@@ -150,7 +150,7 @@ const Login = () => {
                         </button>
                     </form>
 
-                    <p className="mt-8 text-center text-sm text-gray-500">
+                    <p className="mt-6 text-center text-sm text-gray-500">
                         Don't have an account?{' '}
                         <Link to="/register" className="text-primary font-bold hover:text-rose-600 transition-colors">
                             Register here

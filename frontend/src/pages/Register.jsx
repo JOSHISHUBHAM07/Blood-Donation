@@ -44,7 +44,7 @@ const Register = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="min-h-[85vh] flex items-center justify-center relative z-10 px-4 py-10"
+            className="min-h-[85vh] flex items-center justify-center relative z-10 px-4 py-6 md:py-10"
         >
             <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-white/40">
 
@@ -84,8 +84,8 @@ const Register = () => {
                 </div>
 
                 {/* Right — Form Panel */}
-                <div className="bg-white/80 backdrop-blur-xl p-10 flex flex-col justify-center">
-                    <div className="mb-8">
+                <div className="bg-white/80 backdrop-blur-xl p-6 md:p-10 flex flex-col justify-center">
+                    <div className="mb-6 md:mb-8">
                         <span className="text-4xl mb-3 inline-block">✨</span>
                         <h2 className="text-2xl font-extrabold text-gray-800 tracking-tight">Create Account</h2>
                         <p className="text-gray-500 mt-1 text-sm">Start giving or requesting blood today</p>
@@ -106,7 +106,7 @@ const Register = () => {
                                 <input
                                     type="text" name="name" value={formData.name} onChange={onChange}
                                     placeholder="John Doe" required
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
                                 />
                             </div>
                         </div>
@@ -117,7 +117,7 @@ const Register = () => {
                                 <input
                                     type="email" name="email" value={formData.email} onChange={onChange}
                                     placeholder="you@example.com" required
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
                                 />
                             </div>
                         </div>
@@ -126,7 +126,7 @@ const Register = () => {
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Role</label>
                                 <select
                                     name="role" value={formData.role} onChange={onChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all appearance-none"
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all appearance-none text-base"
                                 >
                                     <option value="donor">Donor</option>
                                     <option value="patient">Patient</option>
@@ -136,7 +136,7 @@ const Register = () => {
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Blood Group</label>
                                 <select
                                     name="bloodGroup" value={formData.bloodGroup} onChange={onChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all appearance-none"
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all appearance-none text-base"
                                 >
                                     {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(g => (
                                         <option key={g} value={g}>{g}</option>
@@ -151,14 +151,14 @@ const Register = () => {
                                 <input
                                     type="password" name="password" value={formData.password} onChange={onChange}
                                     placeholder="••••••••" required
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
                                 />
                             </div>
                         </div>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-rose-500 text-white font-bold text-base shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-1"
+                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-rose-500 text-white font-bold text-base shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-1 md:mt-2"
                         >
                             {isLoading ? (
                                 <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@ const Register = () => {
                         </button>
                     </form>
 
-                    <p className="mt-6 text-center text-sm text-gray-500">
+                    <p className="mt-6 text-center text-sm text-gray-500 mb-2 md:mb-0">
                         Already have an account?{' '}
                         <Link to="/login" className="text-primary font-bold hover:text-rose-600 transition-colors">
                             Login here
