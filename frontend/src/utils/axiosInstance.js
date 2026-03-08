@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://blood-donation-li9h.onrender.com/api';
+
 const axiosInstance = axios.create({
-    baseURL: 'https://blood-donation-li9h.onrender.com',
+    baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
     },

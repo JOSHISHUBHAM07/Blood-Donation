@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/auth/';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://blood-donation-li9h.onrender.com/api';
+const API_URL = `${BASE_URL}/auth/`;
 
 // Register user
 const register = async (userData) => {

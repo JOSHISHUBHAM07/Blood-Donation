@@ -63,7 +63,8 @@ export default function AdminDashboard() {
     const downloadCSV = async (type) => {
         try {
             const toastId = toast.loading('Generating export...');
-            const res = await axios.get(`http://localhost:5000/api/export/${type}`, {
+            const BASE_URL = import.meta.env.VITE_API_URL || 'https://blood-donation-li9h.onrender.com/api';
+            const res = await axios.get(`${BASE_URL}/export/${type}`, {
                 headers: { Authorization: `Bearer ${user.token}` },
                 responseType: 'blob'
             });
