@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { login, reset } from '../features/auth/authSlice';
 import { motion } from 'framer-motion';
 import { Droplet, Mail, Lock, ArrowRight, Heart, ShieldCheck, Activity } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -17,7 +18,13 @@ const Login = () => {
     );
 
     useEffect(() => {
-        if (isError) console.error(message);
+        if (isError) {
+            console.error(message);
+            toast.error(message || 'Login failed');
+        }
+        if (isSuccess) {
+            toast.success('Successfully logged in!');
+        }
         if (isSuccess || user) {
             if (user?.role === 'admin') navigate('/admin');
             else if (user?.role === 'patient') navigate('/patient');

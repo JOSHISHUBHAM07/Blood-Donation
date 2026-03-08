@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { register, reset } from '../features/auth/authSlice';
 import { motion } from 'framer-motion';
 import { Droplet, User, Mail, Lock, ArrowRight, Users, Heart, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -25,10 +26,13 @@ const Register = () => {
         e.preventDefault();
         dispatch(register(formData)).then((result) => {
             if (result.meta.requestStatus === 'fulfilled') {
+                toast.success('Registration successful! Welcome.');
                 const role = result.payload?.role;
                 if (role === 'admin') navigate('/admin');
                 else if (role === 'patient') navigate('/patient');
                 else navigate('/donor');
+            } else {
+                toast.error(message || result.payload || 'Registration failed');
             }
             dispatch(reset());
         });
