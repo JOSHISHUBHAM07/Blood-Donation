@@ -21,12 +21,12 @@ const BackgroundBlobs = () => (
     <motion.div
       animate={{ scale: [1, 1.2, 1], x: [0, 100, 0], y: [0, -50, 0] }}
       transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-primary/10 blur-[100px]"
+      className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-primary/10 to-transparent"
     />
     <motion.div
       animate={{ scale: [1, 1.5, 1], x: [0, -100, 0], y: [0, 100, 0] }}
       transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      className="absolute top-[40%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-secondary/10 blur-[120px]"
+      className="absolute top-[40%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-secondary/10 to-transparent"
     />
   </div>
 );

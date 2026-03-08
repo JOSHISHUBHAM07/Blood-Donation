@@ -55,8 +55,8 @@ const Login = () => {
                 {/* Left — Dark Brand Panel */}
                 <div className="relative hidden md:flex flex-col justify-between p-10 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
                     {/* Orbs */}
-                    <div className="absolute -top-10 -left-10 w-48 h-48 bg-primary/30 rounded-full blur-[60px] pointer-events-none" />
-                    <div className="absolute bottom-10 right-0 w-40 h-40 bg-rose-500/20 rounded-full blur-[50px] pointer-events-none" />
+                    <div className="absolute -top-10 -left-10 w-48 h-48 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-primary/30 to-transparent rounded-full pointer-events-none" />
+                    <div className="absolute bottom-10 right-0 w-40 h-40 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-rose-500/20 to-transparent rounded-full pointer-events-none" />
 
                     <div className="relative z-10">
                         <div className="flex items-center gap-2 mb-10">

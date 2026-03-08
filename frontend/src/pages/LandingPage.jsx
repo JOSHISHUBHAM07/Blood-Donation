@@ -124,17 +124,17 @@ const LandingPage = () => {
                     <motion.div
                         animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.5, 0.3] }}
                         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-                        className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-gradient-to-br from-rose-300/30 to-orange-200/20 rounded-full blur-[80px]"
+                        className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-rose-300/30 via-orange-200/10 to-transparent rounded-full"
                     />
                     <motion.div
                         animate={{ scale: [1, 1.2, 1], opacity: [0.25, 0.45, 0.25] }}
                         transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-                        className="absolute -bottom-40 -right-20 w-[600px] h-[600px] bg-gradient-to-tl from-blue-300/20 to-primary/20 rounded-full blur-[100px]"
+                        className="absolute -bottom-40 -right-20 w-[600px] h-[600px] bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-blue-300/20 via-primary/10 to-transparent rounded-full"
                     />
                     <motion.div
                         animate={{ y: [0, -20, 0] }}
                         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                        className="absolute top-1/3 right-[12%] w-64 h-64 bg-purple-200/20 rounded-full blur-[60px]"
+                        className="absolute top-1/3 right-[12%] w-64 h-64 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-purple-200/20 to-transparent rounded-full"
                     />
                 </div>
 
@@ -287,8 +287,8 @@ const LandingPage = () => {
             >
                 <div className="rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 md:p-16 relative overflow-hidden shadow-2xl">
                     {/* Bg decorations */}
-                    <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/30 rounded-full blur-[80px] pointer-events-none" />
-                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-rose-500/20 rounded-full blur-[70px] pointer-events-none" />
+                    <div className="absolute -top-20 -left-20 w-72 h-72 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-primary/30 to-transparent rounded-full pointer-events-none" />
+                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-rose-500/20 to-transparent rounded-full pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
                         {/* Text */}
@@ -397,7 +397,7 @@ const LandingPage = () => {
             </motion.section>
 
             {/* Bottom glow */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-40 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-40 bg-[radial-gradient(ellipse,_var(--tw-gradient-stops))] from-primary/10 to-transparent rounded-full pointer-events-none" />
         </div>
     );
 };
