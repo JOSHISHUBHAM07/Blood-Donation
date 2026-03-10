@@ -11,6 +11,7 @@ import {
     scheduleDonation, completeDonation, updateAvailability, resetDonor
 } from '../features/donor/donorSlice';
 import SkeletonLoader from '../components/SkeletonLoader';
+import MapLocator from '../components/MapLocator';
 
 const statusColors = {
     Pending: 'bg-amber-100 text-amber-700',
@@ -72,6 +73,23 @@ export default function DonorDashboard() {
         e.preventDefault();
         if (!form.date || !form.location) { toast.error('Fill all required fields'); return; }
         dispatch(scheduleDonation(form));
+    };
+
+    // Reverse geocode lat/lng to auto-fill donor location
+    const handleDonorMapSelect = async (loc) => {
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${loc.lat}&lon=${loc.lng}&format=json`,
+                { headers: { 'Accept-Language': 'en' } }
+            );
+            const data = await res.json();
+            const place = data.display_name || data.address?.road || '';
+            const shortPlace = place.split(',').slice(0, 2).join(',').trim();
+            setForm(f => ({ ...f, location: shortPlace || `${loc.lat.toFixed(4)},${loc.lng.toFixed(4)}` }));
+            if (shortPlace) toast.success('Location auto-filled!');
+        } catch {
+            setForm(f => ({ ...f, location: `${loc.lat.toFixed(4)},${loc.lng.toFixed(4)}` }));
+        }
     };
 
     const stats = {
@@ -296,9 +314,11 @@ export default function DonorDashboard() {
                                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 outline-none" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Location *</label>
-                                    <input type="text" value={form.location} placeholder="e.g. City Blood Bank" onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
-                                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 outline-none" />
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Location * <span className="font-normal text-gray-400">(click map or type)</span></label>
+                                    <MapLocator onLocationSelect={handleDonorMapSelect} />
+                                    <input type="text" value={form.location} placeholder="e.g. City Blood Bank"
+                                        onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+                                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 outline-none mt-2" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">Units *</label>

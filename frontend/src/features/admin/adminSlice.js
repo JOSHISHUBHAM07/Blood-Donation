@@ -78,11 +78,12 @@ const adminSlice = createSlice({
             .addCase(fetchRequests.fulfilled, (s, a) => { s.isLoading = false; s.requests = a.payload; })
             .addCase(fetchRequests.rejected, (s, a) => { s.isLoading = false; s.isError = true; s.message = a.payload; })
 
-            .addCase(updateRequestStatus.fulfilled, (s, a) => {
-                s.requests = s.requests.map(r => r._id === a.payload._id ? a.payload : r);
+            .addCase(updateRequestStatus.pending, (s) => { s.isLoading = true; })
+            .addCase(updateRequestStatus.fulfilled, (s) => {
+                s.isLoading = false;
                 s.isSuccess = true;
             })
-            .addCase(updateRequestStatus.rejected, (s, a) => { s.isError = true; s.message = a.payload; })
+            .addCase(updateRequestStatus.rejected, (s, a) => { s.isLoading = false; s.isError = true; s.message = a.payload; })
 
             .addCase(fetchStock.fulfilled, (s, a) => { s.stock = a.payload; })
 
@@ -102,11 +103,12 @@ const adminSlice = createSlice({
             .addCase(fetchDonations.fulfilled, (s, a) => { s.isLoading = false; s.donations = a.payload; })
             .addCase(fetchDonations.rejected, (s, a) => { s.isLoading = false; s.isError = true; s.message = a.payload; })
 
-            .addCase(updateDonationStatus.fulfilled, (s, a) => {
-                s.donations = s.donations.map(d => d._id === a.payload._id ? a.payload : d);
+            .addCase(updateDonationStatus.pending, (s) => { s.isLoading = true; })
+            .addCase(updateDonationStatus.fulfilled, (s) => {
+                s.isLoading = false;
                 s.isSuccess = true;
             })
-            .addCase(updateDonationStatus.rejected, (s, a) => { s.isError = true; s.message = a.payload; });
+            .addCase(updateDonationStatus.rejected, (s, a) => { s.isLoading = false; s.isError = true; s.message = a.payload; });
     },
 });
 

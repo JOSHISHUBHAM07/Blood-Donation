@@ -100,6 +100,25 @@ export default function PatientDashboard() {
         }
     };
 
+    // Reverse geocode lat/lng to auto-fill hospital name
+    const handleMapLocationSelect = async (loc) => {
+        setForm(f => ({ ...f, location: loc }));
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${loc.lat}&lon=${loc.lng}&format=json`,
+                { headers: { 'Accept-Language': 'en' } }
+            );
+            const data = await res.json();
+            const place = data.display_name || data.address?.hospital || data.address?.road || '';
+            if (place) {
+                setForm(f => ({ ...f, hospital: place.split(',').slice(0, 2).join(',').trim() }));
+                toast.success('Location auto-filled from map!');
+            }
+        } catch {
+            // Silently ignore geocoding errors – user can still type manually
+        }
+    };
+
     const stats = {
         total: requests.length,
         pending: requests.filter(r => r.status === 'Pending').length,
@@ -382,9 +401,14 @@ export default function PatientDashboard() {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-semibold text-gray-600 mb-1.5"><MapPin className="inline w-3.5 h-3.5 mr-1" />Hospital Location</label>
-                                <MapLocator onLocationSelect={(loc) => setForm(f => ({ ...f, location: loc }))} />
-                                <p className="text-[10px] text-gray-400 mt-1">Select the location of the hospital to help donors find you.</p>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5"><MapPin className="inline w-3.5 h-3.5 mr-1" />Hospital Location <span className="text-gray-400 font-normal">(click map to auto-fill address)</span></label>
+                                <MapLocator onLocationSelect={handleMapLocationSelect} />
+                                {form.location && (
+                                    <p className="text-[10px] text-emerald-600 mt-1 font-semibold">📍 Location captured: {form.location.lat.toFixed(4)}, {form.location.lng.toFixed(4)}</p>
+                                )}
+                                {!form.location && (
+                                    <p className="text-[10px] text-gray-400 mt-1">Select the location of the hospital to help donors find you.</p>
+                                )}
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-gray-600 mb-1.5"><Phone className="inline w-3.5 h-3.5 mr-1" />Contact Details *</label>

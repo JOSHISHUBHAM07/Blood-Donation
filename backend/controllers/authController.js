@@ -93,6 +93,10 @@ const loginUser = async (req, res) => {
             email: user.email,
             role: user.role,
             bloodGroup: user.bloodGroup,
+            contact: user.contact,
+            address: user.address,
+            isAvailable: user.isAvailable,
+            lastDonationDate: user.lastDonationDate,
             isVerified: user.isVerified,
             token: generateToken(user._id),
         });
@@ -140,6 +144,10 @@ const updateUserProfile = async (req, res) => {
                 email: updatedUser.email,
                 role: updatedUser.role,
                 bloodGroup: updatedUser.bloodGroup,
+                contact: updatedUser.contact,
+                address: updatedUser.address,
+                isAvailable: updatedUser.isAvailable,
+                lastDonationDate: updatedUser.lastDonationDate,
                 isVerified: updatedUser.isVerified,
                 token: generateToken(updatedUser._id),
             });

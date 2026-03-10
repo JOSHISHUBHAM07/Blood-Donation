@@ -18,6 +18,20 @@ export default function ProfileSettings() {
         isAvailable: user?.isAvailable ?? true
     });
 
+    // Re-sync form when user data updates in Redux (e.g., after successful save)
+    useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || '',
+                contact: user.contact || '',
+                address: user.address || '',
+                bloodGroup: user.bloodGroup || '',
+                isAvailable: user.isAvailable ?? true,
+            }));
+        }
+    }, [user]);
+
     useEffect(() => {
         if (isError) {
             toast.error(message);

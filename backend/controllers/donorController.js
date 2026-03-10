@@ -42,6 +42,10 @@ const completeDonation = async (req, res) => {
         if (!donation) return res.status(404).json({ message: 'Donation not found' });
         if (donation.status === 'Completed') return res.status(400).json({ message: 'Already completed' });
 
+        // Fetch full user to reliably get bloodGroup
+        const fullUser = await User.findById(req.user._id);
+        if (!fullUser) return res.status(404).json({ message: 'Donor user not found' });
+
         donation.status = 'Completed';
         await donation.save();
 
@@ -51,12 +55,18 @@ const completeDonation = async (req, res) => {
             isAvailable: false,
         });
 
-        // Add blood units to stock
-        let stock = await BloodStock.findOne({ bloodGroup: req.user.bloodGroup });
-        if (stock) {
-            stock.unitsAvailable += donation.units;
-            await stock.save();
-            logger.info(`Stock updated: ${req.user.bloodGroup} +${donation.units} units`);
+        // Add blood units to stock using fullUser.bloodGroup
+        if (fullUser.bloodGroup) {
+            let stock = await BloodStock.findOne({ bloodGroup: fullUser.bloodGroup });
+            if (stock) {
+                stock.unitsAvailable += donation.units;
+                await stock.save();
+                logger.info(`Stock updated: ${fullUser.bloodGroup} +${donation.units} units`);
+            } else {
+                // Create stock entry if it doesn't exist
+                await BloodStock.create({ bloodGroup: fullUser.bloodGroup, unitsAvailable: donation.units });
+                logger.info(`Stock created: ${fullUser.bloodGroup} with ${donation.units} units`);
+            }
         }
 
         logger.info(`Donation ${donation._id} completed by ${req.user.email}`);

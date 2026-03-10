@@ -97,8 +97,14 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         if (isError) { toast.error(message); dispatch(resetAdmin()); }
-        if (isSuccess) { toast.success('Updated successfully!'); dispatch(resetAdmin()); dispatch(fetchDashboard()); }
-    }, [isError, isSuccess, message, dispatch]);
+        if (isSuccess) {
+            dispatch(resetAdmin());
+            dispatch(fetchDashboard());
+            if (activeTab === 'requests') dispatch(fetchRequests());
+            if (activeTab === 'donations') dispatch(fetchDonations());
+            if (activeTab === 'stock') dispatch(fetchStock());
+        }
+    }, [isError, isSuccess, message, activeTab, dispatch]);
 
     const handleUpdateStatus = () => {
         if (!newStatus) { toast.error('Select a status'); return; }
@@ -107,7 +113,7 @@ export default function AdminDashboard() {
             dispatch(updateDonationStatus({ id: statusModal.requestId, status: newStatus }))
                 .then(res => {
                     if (!res.error) {
-                        toast.success(`Donation ${newStatus}`);
+                        toast.success(`Donation status updated to ${newStatus}`);
                         dispatch(fetchDonations());
                         dispatch(fetchDashboard());
                         setStatusModal(null);
@@ -117,7 +123,7 @@ export default function AdminDashboard() {
             dispatch(updateRequestStatus({ id: statusModal.requestId, status: newStatus, note: statusNote, assignedDonorId: donorIdInput || undefined }))
                 .then(res => {
                     if (!res.error) {
-                        toast.success(`Request ${newStatus}`);
+                        toast.success(`Request status updated to ${newStatus}`);
                         dispatch(fetchRequests());
                         dispatch(fetchDashboard());
                         setStatusModal(null);
@@ -284,9 +290,9 @@ export default function AdminDashboard() {
                                                     P:{req.priorityScore}
                                                 </span>
                                             )}
-                                            {req.status !== 'Completed' && (
+                                            {req.status !== 'Completed' && !['Cancelled', 'Rejected'].includes(req.status) && (
                                                 <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                                                    onClick={() => { setStatusModal({ requestId: req._id, currentStatus: req.status, type: 'request' }); setNewStatus(req.status); setStatusNote(''); setDonorIdInput(''); }}
+                                                    onClick={() => { setStatusModal({ requestId: req._id, currentStatus: req.status, type: 'request' }); setNewStatus('Approved'); setStatusNote(''); setDonorIdInput(''); }}
                                                     className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm">
                                                     Update
                                                 </motion.button>
@@ -349,9 +355,9 @@ export default function AdminDashboard() {
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${statusColors[don.status] || 'bg-gray-100 text-gray-600'}`}>{don.status}</span>
 
-                                            {don.status !== 'Completed' && (
+                                            {don.status !== 'Completed' && !['Cancelled', 'Rejected'].includes(don.status) && (
                                                 <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                                                    onClick={() => { setStatusModal({ requestId: don._id, currentStatus: don.status, type: 'donation' }); setNewStatus(don.status); }}
+                                                    onClick={() => { setStatusModal({ requestId: don._id, currentStatus: don.status, type: 'donation' }); setNewStatus('Approved'); }}
                                                     className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm">
                                                     Update
                                                 </motion.button>
@@ -422,9 +428,14 @@ export default function AdminDashboard() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-bold text-gray-800">User Management <span className="text-gray-400 font-normal text-sm">({users.length})</span></h2>
-                        <button onClick={() => downloadCSV('users')} className="flex items-center gap-1.5 text-sm bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors font-semibold">
-                            <Download className="w-4 h-4" /> Export CSV
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => dispatch(fetchUsers())} className="flex items-center gap-1.5 text-sm bg-gray-50 text-gray-500 hover:text-violet-600 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                                <RefreshCw className="w-4 h-4" /> Refresh
+                            </button>
+                            <button onClick={() => downloadCSV('users')} className="flex items-center gap-1.5 text-sm bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors font-semibold">
+                                <Download className="w-4 h-4" /> Export CSV
+                            </button>
+                        </div>
                     </div>
                     {isLoading ? (
                         <div className="mt-4"><SkeletonLoader type="table" count={5} /></div>
@@ -434,7 +445,7 @@ export default function AdminDashboard() {
                                 <table className="w-full text-sm">
                                     <thead className="bg-gray-50 border-b border-gray-100">
                                         <tr>
-                                            {['Name', 'Email', 'Role', 'Blood Group', 'Last Login', 'Status', 'Action'].map(h => (
+                                            {['Name', 'Email', 'Role', 'Blood Group', 'Available', 'Last Login', 'Status', 'Action'].map(h => (
                                                 <th key={h} className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wide">{h}</th>
                                             ))}
                                         </tr>
@@ -449,6 +460,11 @@ export default function AdminDashboard() {
                                                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${u.role === 'donor' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}`}>{u.role}</span>
                                                 </td>
                                                 <td className="px-4 py-3 font-bold text-gray-700">{u.bloodGroup || '—'}</td>
+                                                <td className="px-4 py-3">
+                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${u.isAvailable ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                                                        {u.role === 'donor' ? (u.isAvailable ? '✓ Available' : '✗ Unavailable') : '—'}
+                                                    </span>
+                                                </td>
                                                 <td className="px-4 py-3 text-gray-400 text-xs">{u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never'}</td>
                                                 <td className="px-4 py-3">
                                                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${u.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>
