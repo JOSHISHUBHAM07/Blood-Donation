@@ -70,7 +70,12 @@ export default function MapLocator({ onLocationSelect, initialPosition }) {
     }, []); // Only run once on mount
 
     return (
-        <div className="w-full h-64 rounded-xl overflow-hidden shadow-inner border border-gray-200 z-0 relative bg-gray-50">
+        <div className="relative w-full rounded-xl overflow-hidden border border-gray-200 shadow-sm" style={{ height: '220px' }}>
+            {/* Instruction overlay */}
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 bg-black/60 text-white text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm pointer-events-none flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-rose-400 rounded-full animate-pulse inline-block" />
+                Click map to pin your location
+            </div>
             <div ref={mapContainerRef} className="h-full w-full z-10" />
         </div>
     );

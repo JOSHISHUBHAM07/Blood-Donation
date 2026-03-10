@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { register, reset } from '../features/auth/authSlice';
 import { motion } from 'framer-motion';
-import { Droplet, User, Mail, Lock, ArrowRight, Users, Heart, Sparkles } from 'lucide-react';
+import { Droplet, User, Mail, Lock, ArrowRight, Users, Heart, Sparkles, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Register = () => {
@@ -148,10 +148,10 @@ const Register = () => {
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">📞</span>
+                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
-                                    type="text" name="contact" value={formData.contact} onChange={onChange}
-                                    placeholder="e.g., +1 234 567 8900" required
+                                    type="tel" name="contact" value={formData.contact} onChange={onChange}
+                                    placeholder="e.g., +91 98765 43210" required
                                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
                                 />
                             </div>
