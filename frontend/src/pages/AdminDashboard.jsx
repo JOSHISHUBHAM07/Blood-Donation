@@ -8,12 +8,12 @@ import {
     LayoutDashboard, Users, Droplet, Activity, AlertTriangle,
     CheckCircle, Clock, Shield, ClipboardList, Loader2,
     ChevronDown, X, RefreshCw, TrendingUp, Settings,
-    Download, ChevronLeft, ChevronRight
+    Download, ChevronLeft, ChevronRight, Heart
 } from 'lucide-react';
 import {
     fetchDashboard, fetchRequests, updateRequestStatus,
     fetchStock, updateStock, fetchUsers, toggleUserStatus,
-    fetchAuditLogs, resetAdmin
+    fetchAuditLogs, fetchDonations, updateDonationStatus, resetAdmin
 } from '../features/admin/adminSlice';
 import SkeletonLoader from '../components/SkeletonLoader';
 
@@ -26,6 +26,7 @@ const statusColors = {
     Pending: 'bg-amber-100 text-amber-700',
     Approved: 'bg-blue-100 text-blue-700',
     'Donor Assigned': 'bg-purple-100 text-purple-700',
+    Scheduled: 'bg-blue-100 text-blue-700',
     Completed: 'bg-emerald-100 text-emerald-700',
     Rejected: 'bg-red-100 text-red-700',
     Cancelled: 'bg-gray-100 text-gray-600',
@@ -43,20 +44,21 @@ const cardVariants = {
     show: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] } }),
 };
 
-const TABS = ['dashboard', 'requests', 'stock', 'users', 'audit'];
+const TABS = ['dashboard', 'requests', 'donations', 'stock', 'users', 'audit'];
 
 export default function AdminDashboard() {
     const dispatch = useDispatch();
     const { user } = useSelector(s => s.auth);
-    const { dashboard, requests, stock, users, auditLogs, isLoading, isError, isSuccess, message } = useSelector(s => s.admin);
+    const { dashboard, requests, donations, stock, users, auditLogs, isLoading, isError, isSuccess, message } = useSelector(s => s.admin);
 
     const [activeTab, setActiveTab] = useState('dashboard');
     const [editStock, setEditStock] = useState({});
-    const [statusModal, setStatusModal] = useState(null); // { requestId, currentStatus }
+    const [statusModal, setStatusModal] = useState(null); // { requestId, currentStatus, type: 'request' | 'donation' }
     const [newStatus, setNewStatus] = useState('');
     const [statusNote, setStatusNote] = useState('');
     const [donorIdInput, setDonorIdInput] = useState('');
     const [requestsPage, setRequestsPage] = useState(1);
+    const [donationsPage, setDonationsPage] = useState(1);
     const [usersPage, setUsersPage] = useState(1);
     const itemsPerPage = 8;
 
@@ -90,6 +92,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (activeTab === 'users') dispatch(fetchUsers());
         if (activeTab === 'audit') dispatch(fetchAuditLogs(1));
+        if (activeTab === 'donations') dispatch(fetchDonations());
     }, [activeTab, dispatch]);
 
     useEffect(() => {
@@ -99,15 +102,28 @@ export default function AdminDashboard() {
 
     const handleUpdateStatus = () => {
         if (!newStatus) { toast.error('Select a status'); return; }
-        dispatch(updateRequestStatus({ id: statusModal.requestId, status: newStatus, note: statusNote, assignedDonorId: donorIdInput || undefined }))
-            .then(res => {
-                if (!res.error) {
-                    toast.success(`Request ${newStatus}`);
-                    dispatch(fetchRequests());
-                    dispatch(fetchDashboard());
-                    setStatusModal(null);
-                } else toast.error(res.payload);
-            });
+
+        if (statusModal.type === 'donation') {
+            dispatch(updateDonationStatus({ id: statusModal.requestId, status: newStatus }))
+                .then(res => {
+                    if (!res.error) {
+                        toast.success(`Donation ${newStatus}`);
+                        dispatch(fetchDonations());
+                        dispatch(fetchDashboard());
+                        setStatusModal(null);
+                    } else toast.error(res.payload);
+                });
+        } else {
+            dispatch(updateRequestStatus({ id: statusModal.requestId, status: newStatus, note: statusNote, assignedDonorId: donorIdInput || undefined }))
+                .then(res => {
+                    if (!res.error) {
+                        toast.success(`Request ${newStatus}`);
+                        dispatch(fetchRequests());
+                        dispatch(fetchDashboard());
+                        setStatusModal(null);
+                    } else toast.error(res.payload);
+                });
+        }
     };
 
     const handleUpdateStock = (bg) => {
@@ -138,8 +154,23 @@ export default function AdminDashboard() {
         { label: 'Completed', value: dashboard.completedRequests, icon: TrendingUp, color: 'from-teal-500 to-teal-600' },
     ] : [];
 
-    const paginatedRequests = requests?.slice((requestsPage - 1) * itemsPerPage, requestsPage * itemsPerPage) || [];
-    const totalRequestPages = Math.max(1, Math.ceil((requests?.length || 0) / itemsPerPage));
+    const sortedRequests = [...(requests || [])].sort((a, b) => {
+        if (a.status === 'Completed' && b.status !== 'Completed') return 1;
+        if (a.status !== 'Completed' && b.status === 'Completed') return -1;
+        return 0;
+    });
+
+    const sortedDonations = [...(donations || [])].sort((a, b) => {
+        if (a.status === 'Completed' && b.status !== 'Completed') return 1;
+        if (a.status !== 'Completed' && b.status === 'Completed') return -1;
+        return 0;
+    });
+
+    const paginatedRequests = sortedRequests.slice((requestsPage - 1) * itemsPerPage, requestsPage * itemsPerPage);
+    const totalRequestPages = Math.max(1, Math.ceil(sortedRequests.length / itemsPerPage));
+
+    const paginatedDonations = sortedDonations.slice((donationsPage - 1) * itemsPerPage, donationsPage * itemsPerPage);
+    const totalDonationPages = Math.max(1, Math.ceil(sortedDonations.length / itemsPerPage));
 
     const paginatedUsers = users?.slice((usersPage - 1) * itemsPerPage, usersPage * itemsPerPage) || [];
     const totalUserPages = Math.max(1, Math.ceil((users?.length || 0) / itemsPerPage));
@@ -164,6 +195,7 @@ export default function AdminDashboard() {
                 {[
                     { key: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
                     { key: 'requests', icon: ClipboardList, label: 'Requests' },
+                    { key: 'donations', icon: Heart, label: 'Donations' },
                     { key: 'stock', icon: Droplet, label: 'Blood Stock' },
                     { key: 'users', icon: Users, label: 'Users' },
                     { key: 'audit', icon: Shield, label: 'Audit Logs' },
@@ -252,11 +284,13 @@ export default function AdminDashboard() {
                                                     P:{req.priorityScore}
                                                 </span>
                                             )}
-                                            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                                                onClick={() => { setStatusModal({ requestId: req._id, currentStatus: req.status }); setNewStatus(req.status); setStatusNote(''); setDonorIdInput(''); }}
-                                                className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm">
-                                                Update
-                                            </motion.button>
+                                            {req.status !== 'Completed' && (
+                                                <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                                    onClick={() => { setStatusModal({ requestId: req._id, currentStatus: req.status, type: 'request' }); setNewStatus(req.status); setStatusNote(''); setDonorIdInput(''); }}
+                                                    className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm">
+                                                    Update
+                                                </motion.button>
+                                            )}
                                         </div>
                                     </div>
                                 </motion.div>
@@ -270,6 +304,71 @@ export default function AdminDashboard() {
                                     </button>
                                     <span className="text-sm font-medium text-gray-600">Page {requestsPage} of {totalRequestPages}</span>
                                     <button disabled={requestsPage === totalRequestPages} onClick={() => setRequestsPage(p => p + 1)} className="p-1 rounded-lg hover:bg-gray-100 disabled:opacity-50">
+                                        <ChevronRight className="w-5 h-5 text-gray-600" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </motion.div>
+            )}
+
+            {/* Donations Tab */}
+            {activeTab === 'donations' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h2 className="text-lg font-bold text-gray-800">All Donor Donations <span className="text-gray-400 font-normal text-sm">({donations.length})</span></h2>
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => downloadCSV('donations')} className="flex items-center gap-1.5 text-sm bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors font-semibold">
+                                <Download className="w-4 h-4" /> Export CSV
+                            </button>
+                            <button onClick={() => dispatch(fetchDonations())} className="flex items-center gap-1.5 text-sm bg-gray-50 text-gray-500 hover:text-violet-600 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                                <RefreshCw className="w-4 h-4" /> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    {isLoading ? (
+                        <div className="mt-4"><SkeletonLoader type="card" count={3} /></div>
+                    ) : donations.length === 0 ? (
+                        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200 text-gray-400">No donations found</div>
+                    ) : (
+                        <div className="space-y-3">
+                            {paginatedDonations.map((don, i) => (
+                                <motion.div key={don._id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                                    className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-all">
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white font-extrabold text-base shadow">
+                                                {don.donorId?.bloodGroup || '—'}
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-gray-800 text-sm">{don.location}</div>
+                                                <div className="text-xs text-gray-500">{don.donorId?.name} · {don.units} unit(s) · {new Date(don.date).toLocaleDateString()}</div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${statusColors[don.status] || 'bg-gray-100 text-gray-600'}`}>{don.status}</span>
+
+                                            {don.status !== 'Completed' && (
+                                                <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                                    onClick={() => { setStatusModal({ requestId: don._id, currentStatus: don.status, type: 'donation' }); setNewStatus(don.status); }}
+                                                    className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm">
+                                                    Update
+                                                </motion.button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+
+                            {/* Pagination */}
+                            {donations.length > itemsPerPage && (
+                                <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-gray-100 mt-4">
+                                    <button disabled={donationsPage === 1} onClick={() => setDonationsPage(p => p - 1)} className="p-1 rounded-lg hover:bg-gray-100 disabled:opacity-50">
+                                        <ChevronLeft className="w-5 h-5 text-gray-600" />
+                                    </button>
+                                    <span className="text-sm font-medium text-gray-600">Page {donationsPage} of {totalDonationPages}</span>
+                                    <button disabled={donationsPage === totalDonationPages} onClick={() => setDonationsPage(p => p + 1)} className="p-1 rounded-lg hover:bg-gray-100 disabled:opacity-50">
                                         <ChevronRight className="w-5 h-5 text-gray-600" />
                                     </button>
                                 </div>
@@ -448,10 +547,10 @@ export default function AdminDashboard() {
                                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">New Status</label>
                                     <select value={newStatus} onChange={e => setNewStatus(e.target.value)}
                                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-violet-300 outline-none">
-                                        {statusOptions.map(s => <option key={s}>{s}</option>)}
+                                        {['Approved', 'Rejected'].map(s => <option key={s}>{s}</option>)}
                                     </select>
                                 </div>
-                                {(newStatus === 'Donor Assigned' || newStatus === 'Approved') && (
+                                {statusModal.type === 'request' && (newStatus === 'Donor Assigned' || newStatus === 'Approved') && (
                                     <div>
                                         <label className="block text-xs font-semibold text-gray-600 mb-1.5">Donor ID (optional)</label>
                                         <input type="text" value={donorIdInput} placeholder="MongoDB ObjectId of donor"
@@ -459,12 +558,14 @@ export default function AdminDashboard() {
                                             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-violet-300 outline-none" />
                                     </div>
                                 )}
-                                <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Note (optional)</label>
-                                    <textarea value={statusNote} rows={2} placeholder="Admin note..."
-                                        onChange={e => setStatusNote(e.target.value)}
-                                        className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-violet-300 outline-none resize-none" />
-                                </div>
+                                {statusModal.type === 'request' && (
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Note (optional)</label>
+                                        <textarea value={statusNote} rows={2} placeholder="Admin note..."
+                                            onChange={e => setStatusNote(e.target.value)}
+                                            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-violet-300 outline-none resize-none" />
+                                    </div>
+                                )}
                                 <div className="flex gap-3">
                                     <button onClick={() => setStatusModal(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-colors">
                                         Cancel

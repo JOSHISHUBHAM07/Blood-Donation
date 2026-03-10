@@ -173,6 +173,52 @@ const updateRequestStatus = async (req, res) => {
     }
 };
 
+// ─── Donations ────────────────────────────────────────────────────────────────
+const getAllDonations = async (req, res) => {
+    try {
+        const donations = await Donation.find({})
+            .populate('donorId', 'name email bloodGroup contact')
+            .sort({ createdAt: -1 });
+        res.json(donations);
+    } catch (error) {
+        logger.error(`getAllDonations error: ${error.message}`);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const updateDonationStatus = async (req, res) => {
+    const { status } = req.body;
+
+    try {
+        const donation = await Donation.findById(req.params.id);
+        if (!donation) {
+            return res.status(404).json({ message: 'Donation not found' });
+        }
+
+        const oldStatus = donation.status;
+        donation.status = status || donation.status;
+
+        const updatedDonation = await donation.save();
+
+        // Audit log
+        await AuditLog.create({
+            userId: req.user._id,
+            role: req.user.role,
+            actionType: 'DONATION_STATUS_UPDATE',
+            affectedEntity: 'Donation',
+            entityId: donation._id,
+            oldValue: { status: oldStatus },
+            newValue: { status: donation.status },
+        });
+
+        logger.info(`Donation ${donation._id} status: ${oldStatus} → ${donation.status} by ${req.user.email}`);
+        res.json(updatedDonation);
+    } catch (error) {
+        logger.error(`updateDonationStatus error: ${error.message}`);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 const getUsers = async (req, res) => {
     try {
@@ -233,18 +279,6 @@ const getAuditLogs = async (req, res) => {
     }
 };
 
-// ─── Donations ────────────────────────────────────────────────────────────────
-const getAllDonations = async (req, res) => {
-    try {
-        const donations = await Donation.find({})
-            .populate('donorId', 'name email bloodGroup contact')
-            .sort({ createdAt: -1 });
-        res.json(donations);
-    } catch (error) {
-        logger.error(`getAllDonations error: ${error.message}`);
-        res.status(500).json({ message: error.message });
-    }
-};
 
 module.exports = {
     getDashboardData,
@@ -256,4 +290,5 @@ module.exports = {
     toggleUserStatus,
     getAuditLogs,
     getAllDonations,
+    updateDonationStatus
 };

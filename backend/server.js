@@ -17,8 +17,16 @@ app.use(helmet());
 const rawClientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
 const clientUrl = rawClientUrl.startsWith('http') ? rawClientUrl : `https://${rawClientUrl}`;
 
+const allowedOrigins = [clientUrl, 'http://localhost:5173', 'http://localhost:5174'];
+
 app.use(cors({
-  origin: clientUrl,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 

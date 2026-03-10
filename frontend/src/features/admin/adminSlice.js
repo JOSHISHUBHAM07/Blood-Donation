@@ -41,11 +41,22 @@ export const fetchAuditLogs = createAsyncThunk('admin/fetchAuditLogs', async (pa
     catch (err) { return thunkAPI.rejectWithValue(err.response?.data?.message || err.message); }
 });
 
+export const fetchDonations = createAsyncThunk('admin/fetchDonations', async (_, thunkAPI) => {
+    try { return await adminService.getAllDonations(); }
+    catch (err) { return thunkAPI.rejectWithValue(err.response?.data?.message || err.message); }
+});
+
+export const updateDonationStatus = createAsyncThunk('admin/updateDonationStatus', async ({ id, status }, thunkAPI) => {
+    try { return await adminService.updateDonationStatus(id, status); }
+    catch (err) { return thunkAPI.rejectWithValue(err.response?.data?.message || err.message); }
+});
+
 const adminSlice = createSlice({
     name: 'admin',
     initialState: {
         dashboard: null,
         requests: [],
+        donations: [],
         stock: [],
         users: [],
         auditLogs: { logs: [], total: 0, page: 1, totalPages: 1 },
@@ -85,7 +96,17 @@ const adminSlice = createSlice({
                 s.users = s.users.map(u => u._id === a.payload.user._id ? a.payload.user : u);
             })
 
-            .addCase(fetchAuditLogs.fulfilled, (s, a) => { s.auditLogs = a.payload; });
+            .addCase(fetchAuditLogs.fulfilled, (s, a) => { s.auditLogs = a.payload; })
+
+            .addCase(fetchDonations.pending, (s) => { s.isLoading = true; })
+            .addCase(fetchDonations.fulfilled, (s, a) => { s.isLoading = false; s.donations = a.payload; })
+            .addCase(fetchDonations.rejected, (s, a) => { s.isLoading = false; s.isError = true; s.message = a.payload; })
+
+            .addCase(updateDonationStatus.fulfilled, (s, a) => {
+                s.donations = s.donations.map(d => d._id === a.payload._id ? a.payload : d);
+                s.isSuccess = true;
+            })
+            .addCase(updateDonationStatus.rejected, (s, a) => { s.isError = true; s.message = a.payload; });
     },
 });
 

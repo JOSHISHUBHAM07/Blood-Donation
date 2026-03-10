@@ -13,6 +13,7 @@ const Register = () => {
         password: '',
         role: 'donor',
         bloodGroup: 'A+',
+        contact: '',
     });
 
     const navigate = useNavigate();
@@ -142,6 +143,17 @@ const Register = () => {
                                         <option key={g} value={g}>{g}</option>
                                     ))}
                                 </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">📞</span>
+                                <input
+                                    type="text" name="contact" value={formData.contact} onChange={onChange}
+                                    placeholder="e.g., +1 234 567 8900" required
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
+                                />
                             </div>
                         </div>
                         <div>

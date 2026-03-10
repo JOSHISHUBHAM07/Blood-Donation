@@ -40,6 +40,16 @@ const fetchAuditLogs = async (page = 1) => {
     return res.data;
 };
 
+const getAllDonations = async () => {
+    const res = await axiosInstance.get('/admin/donations');
+    return res.data;
+};
+
+const updateDonationStatus = async (id, status) => {
+    const res = await axiosInstance.put(`/admin/donations/${id}/status`, { status });
+    return res.data;
+};
+
 const adminService = {
     fetchDashboard,
     fetchRequests,
@@ -49,5 +59,7 @@ const adminService = {
     fetchUsers,
     toggleUserStatus,
     fetchAuditLogs,
+    getAllDonations,
+    updateDonationStatus,
 };
 export default adminService;

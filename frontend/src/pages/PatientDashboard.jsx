@@ -7,7 +7,7 @@ import {
     Plus, X, Calendar, Hospital, Phone, FileText, ChevronDown, Loader2, MapPin
 } from 'lucide-react';
 import {
-    fetchMyRequests, createRequest, cancelRequest,
+    fetchMyRequests, createRequest, cancelRequest, completeRequest,
     fetchBloodStock, resetPatient
 } from '../features/patient/patientSlice';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -50,7 +50,7 @@ export default function PatientDashboard() {
     const { requests, bloodStock, isLoading, isError, isSuccess, message } = useSelector((s) => s.patient);
 
     const [showModal, setShowModal] = useState(false);
-    const [activeTab, setActiveTab] = useState('requests');
+    const [activeTab, setActiveTab] = useState('active');
     const [form, setForm] = useState({
         bloodGroup: 'A+', quantity: 1, hospital: '',
         requiredDate: '', emergencyLevel: 'High',
@@ -85,6 +85,17 @@ export default function PatientDashboard() {
             dispatch(cancelRequest(id)).then(() => {
                 dispatch(fetchMyRequests());
                 toast.success('Request cancelled');
+            });
+        }
+    };
+
+    const handleComplete = (id) => {
+        if (window.confirm('Mark this request as completed? This confirms you have received the required blood.')) {
+            dispatch(completeRequest(id)).then((res) => {
+                if (!res.error) {
+                    dispatch(fetchMyRequests());
+                    toast.success('Request marked as completed');
+                }
             });
         }
     };
@@ -138,88 +149,149 @@ export default function PatientDashboard() {
 
             {/* Tabs */}
             <div className="flex flex-wrap gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
-                {['requests', 'blood-availability'].map(tab => (
+                {['active', 'history', 'blood-availability'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     >
-                        {tab === 'requests' ? '🩸 My Requests' : '📊 Blood Availability'}
+                        {tab === 'active' ? '🩸 Active Requests' : tab === 'history' ? '🕰️ History' : '📊 Blood Availability'}
                     </button>
                 ))}
             </div>
 
-            {/* Requests Tab */}
-            {activeTab === 'requests' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-lg font-bold text-gray-800">Blood Requests</h2>
-                        <motion.button
-                            whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                            onClick={() => setShowModal(true)}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-xl font-semibold text-sm shadow-md shadow-rose-200 hover:shadow-lg transition-all"
-                        >
-                            <Plus className="w-4 h-4" /> New Request
-                        </motion.button>
-                    </div>
+            {/* Active Requests Tab */}
+            {activeTab === 'active' && (() => {
+                const activeRequests = requests.filter(r => ['Pending', 'Approved', 'Donor Assigned'].includes(r.status));
+                return (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-lg font-bold text-gray-800">Active Requests</h2>
+                            <motion.button
+                                whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                onClick={() => setShowModal(true)}
+                                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-xl font-semibold text-sm shadow-md shadow-rose-200 hover:shadow-lg transition-all"
+                            >
+                                <Plus className="w-4 h-4" /> New Request
+                            </motion.button>
+                        </div>
 
-                    {isLoading ? (
-                        <div className="mt-4"><SkeletonLoader type="card" count={3} /></div>
-                    ) : requests.length === 0 ? (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
-                            <Droplet className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                            <p className="text-gray-400 font-medium">No blood requests yet</p>
-                            <button onClick={() => setShowModal(true)} className="mt-4 text-rose-500 font-semibold text-sm hover:underline">+ Create your first request</button>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {requests.map((req, i) => (
-                                <motion.div
-                                    key={req._id}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: i * 0.05 }}
-                                    className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5"
-                                >
-                                    <div className="flex flex-wrap items-start justify-between gap-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white font-extrabold text-lg shadow">
-                                                {req.bloodGroup}
+                        {isLoading ? (
+                            <div className="mt-4"><SkeletonLoader type="card" count={3} /></div>
+                        ) : activeRequests.length === 0 ? (
+                            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
+                                <Droplet className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                                <p className="text-gray-400 font-medium">No active blood requests</p>
+                                <button onClick={() => setShowModal(true)} className="mt-4 text-rose-500 font-semibold text-sm hover:underline">+ Create a request</button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {activeRequests.map((req, i) => (
+                                    <motion.div
+                                        key={req._id}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                        className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 ${req.status === 'Pending' ? 'opacity-60 blur-[1.5px] hover:blur-none hover:opacity-100' : ''}`}
+                                    >
+                                        <div className="flex flex-wrap items-start justify-between gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white font-extrabold text-lg shadow">
+                                                    {req.bloodGroup}
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-gray-800">{req.hospital}</div>
+                                                    <div className="text-sm text-gray-500">{req.quantity} unit(s) · {new Date(req.requiredDate).toLocaleDateString()}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="font-bold text-gray-800">{req.hospital}</div>
-                                                <div className="text-sm text-gray-500">{req.quantity} unit(s) · {new Date(req.requiredDate).toLocaleDateString()}</div>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${emergencyColors[req.emergencyLevel]}`}>{req.emergencyLevel}</span>
+                                                <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${statusColors[req.status] || 'bg-gray-100 text-gray-600'}`}>{req.status}</span>
+                                                {req.priorityScore > 0 && (
+                                                    <span className={`px-2.5 py-1 rounded-lg text-xs font-extrabold ${priorityBadge(req.priorityScore)}`}>
+                                                        Score: {req.priorityScore}
+                                                    </span>
+                                                )}
+                                                {req.status === 'Pending' && (
+                                                    <button onClick={() => handleCancel(req._id)} className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Cancel">
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                                {['Approved', 'Donor Assigned'].includes(req.status) && (
+                                                    <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                                        onClick={() => handleComplete(req._id)}
+                                                        className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-colors shadow-sm">
+                                                        Mark Complete
+                                                    </motion.button>
+                                                )}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${emergencyColors[req.emergencyLevel]}`}>{req.emergencyLevel}</span>
-                                            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${statusColors[req.status] || 'bg-gray-100 text-gray-600'}`}>{req.status}</span>
-                                            {req.priorityScore > 0 && (
-                                                <span className={`px-2.5 py-1 rounded-lg text-xs font-extrabold ${priorityBadge(req.priorityScore)}`}>
-                                                    Score: {req.priorityScore}
-                                                </span>
-                                            )}
-                                            {req.status === 'Pending' && (
-                                                <button onClick={() => handleCancel(req._id)} className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Cancel">
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {req.medicalReason && (
-                                        <p className="mt-3 text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2">{req.medicalReason}</p>
-                                    )}
-                                    {req.assignedDonorId && (
-                                        <div className="mt-3 text-sm text-purple-600 font-medium bg-purple-50 rounded-lg px-3 py-2">
-                                            Donor Assigned: {req.assignedDonorId.name} · {req.assignedDonorId.contact}
-                                        </div>
-                                    )}
-                                </motion.div>
-                            ))}
+                                        {req.medicalReason && (
+                                            <p className="mt-3 text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2">{req.medicalReason}</p>
+                                        )}
+                                        {req.assignedDonorId && (
+                                            <div className="mt-3 text-sm text-purple-600 font-medium bg-purple-50 rounded-lg px-3 py-2">
+                                                Donor Assigned: {req.assignedDonorId.name} · {req.assignedDonorId.contact}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+                );
+            })()}
+
+            {/* History Requests Tab */}
+            {activeTab === 'history' && (() => {
+                const historyRequests = requests.filter(r => ['Completed', 'Rejected', 'Cancelled'].includes(r.status));
+                return (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-lg font-bold text-gray-800">Request History</h2>
                         </div>
-                    )}
-                </motion.div>
-            )}
+
+                        {isLoading ? (
+                            <div className="mt-4"><SkeletonLoader type="card" count={3} /></div>
+                        ) : historyRequests.length === 0 ? (
+                            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
+                                <Clock className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                                <p className="text-gray-400 font-medium">No past requests</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {historyRequests.map((req, i) => (
+                                    <motion.div
+                                        key={req._id}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                        className="bg-white rounded-2xl border border-gray-100 opacity-80 p-5"
+                                    >
+                                        <div className="flex flex-wrap items-start justify-between gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-extrabold text-lg shadow ${req.status === 'Completed' ? 'bg-emerald-500' : 'bg-gray-400'}`}>
+                                                    {req.bloodGroup}
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-gray-800">{req.hospital}</div>
+                                                    <div className="text-sm text-gray-500">{req.quantity} unit(s) · {new Date(req.requiredDate).toLocaleDateString()}</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${statusColors[req.status] || 'bg-gray-100 text-gray-600'}`}>{req.status}</span>
+                                            </div>
+                                        </div>
+                                        {req.medicalReason && (
+                                            <p className="mt-3 text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2">{req.medicalReason}</p>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+                );
+            })()}
 
             {/* Blood Availability Tab */}
             {activeTab === 'blood-availability' && (

@@ -9,6 +9,7 @@ const {
     toggleUserStatus,
     getAuditLogs,
     getAllDonations,
+    updateDonationStatus
 } = require('../controllers/adminController.js');
 const { protect, authorize } = require('../middleware/authMiddleware.js');
 
@@ -25,5 +26,6 @@ router.get('/users', getUsers);
 router.put('/users/:id/status', toggleUserStatus);
 router.get('/audit-logs', getAuditLogs);
 router.get('/donations', getAllDonations);
+router.put('/donations/:id/status', updateDonationStatus);
 
 module.exports = router;

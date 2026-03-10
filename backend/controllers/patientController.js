@@ -104,6 +104,47 @@ const cancelRequest = async (req, res) => {
     }
 };
 
+const completeRequest = async (req, res) => {
+    try {
+        const request = await Request.findOne({ _id: req.params.id, patientId: req.user._id });
+        if (!request) {
+            return res.status(404).json({ message: 'Request not found or unauthorised' });
+        }
+        if (!['Approved', 'Donor Assigned'].includes(request.status)) {
+            return res.status(400).json({ message: `Cannot complete a request with status: ${request.status}` });
+        }
+
+        const oldStatus = request.status;
+        request.status = 'Completed';
+        request.approvalLogs.push({
+            status: 'Completed',
+            changedBy: req.user._id,
+            note: 'Marked as completed by patient',
+            timestamp: new Date(),
+        });
+
+        // Deduct stock if it was Approved (from blood bank)
+        // If it was Donor Assigned, it's assumed the donor gave blood directly or to the bank, stock handling depends on donor flow, but to mirror admin we deduct if possible
+        if (oldStatus !== 'Completed') {
+            const stock = await BloodStock.findOne({ bloodGroup: request.bloodGroup });
+            if (stock && oldStatus === 'Approved') {
+                if (stock.unitsAvailable < request.quantity) {
+                    return res.status(400).json({ message: `Insufficient stock for ${request.bloodGroup}. Available: ${stock.unitsAvailable} units.` });
+                }
+                stock.unitsAvailable = Math.max(0, stock.unitsAvailable - request.quantity);
+                await stock.save();
+                logger.info(`Blood stock deducted on patient complete: ${request.bloodGroup} -${request.quantity} units`);
+            }
+        }
+
+        await request.save();
+        res.json({ message: 'Request completed successfully', request });
+    } catch (error) {
+        logger.error(`completeRequest error: ${error.message}`);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const getBloodAvailability = async (req, res) => {
     try {
         const stock = await BloodStock.find({});
@@ -117,5 +158,6 @@ module.exports = {
     createBloodRequest,
     getMyRequests,
     cancelRequest,
+    completeRequest,
     getBloodAvailability
 };

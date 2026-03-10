@@ -27,8 +27,8 @@ const donationSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Scheduled', 'Completed', 'Cancelled'],
-        default: 'Scheduled'
+        enum: ['Pending', 'Approved', 'Rejected', 'Scheduled', 'Completed', 'Cancelled'],
+        default: 'Pending'
     },
     // Enterprise fields
     medicalClearance: {

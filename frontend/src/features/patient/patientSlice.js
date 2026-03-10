@@ -16,6 +16,11 @@ export const cancelRequest = createAsyncThunk('patient/cancelRequest', async (id
     catch (err) { return thunkAPI.rejectWithValue(err.response?.data?.message || err.message); }
 });
 
+export const completeRequest = createAsyncThunk('patient/completeRequest', async (id, thunkAPI) => {
+    try { return await patientService.completeRequest(id); }
+    catch (err) { return thunkAPI.rejectWithValue(err.response?.data?.message || err.message); }
+});
+
 export const fetchBloodStock = createAsyncThunk('patient/fetchBloodStock', async (_, thunkAPI) => {
     try { return await patientService.fetchBloodStock(); }
     catch (err) { return thunkAPI.rejectWithValue(err.response?.data?.message || err.message); }
@@ -45,6 +50,10 @@ const patientSlice = createSlice({
             .addCase(createRequest.rejected, (s, a) => { s.isLoading = false; s.isError = true; s.message = a.payload; })
 
             .addCase(cancelRequest.fulfilled, (s, a) => {
+                s.requests = s.requests.map(r => r._id === a.payload.request._id ? a.payload.request : r);
+            })
+
+            .addCase(completeRequest.fulfilled, (s, a) => {
                 s.requests = s.requests.map(r => r._id === a.payload.request._id ? a.payload.request : r);
             })
 
