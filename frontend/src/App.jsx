@@ -73,11 +73,11 @@ function App() {
     <Router>
       <div className="flex flex-col min-h-screen text-gray-900 font-sans relative">
         <BackgroundBlobs />
-        <Navbar />
+        <div className="relative z-[5]"><Navbar /></div>
         <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
           <AnimatedRoutes />
         </main>
-        <Footer />
+        <div className="relative z-[5]"><Footer /></div>
         <Toaster
           position="top-right"
           toastOptions={{
