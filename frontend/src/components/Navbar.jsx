@@ -59,9 +59,16 @@ const Navbar = () => {
                                     <span>Dashboard</span>
                                 </Link>
                                 <Link to="/profile"
-                                    className={`text-gray-600 hover:text-primary font-medium transition-colors flex items-center space-x-1 border px-3 py-1.5 rounded-full hover:bg-gray-50 ${location.pathname === '/profile' ? 'border-primary/30 bg-rose-50 text-primary' : 'border-gray-200'}`}>
-                                    <UserCircle className="w-4 h-4" />
-                                    <span>Profile</span>
+                                    className={`relative flex items-center justify-center rounded-full transition-all border-2 ${location.pathname === '/profile' ? 'border-rose-400 shadow-sm' : 'border-transparent hover:border-gray-200'}`}
+                                    title="Profile Settings"
+                                >
+                                    {user.profilePic ? (
+                                        <img src={user.profilePic} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                            {user.name?.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
                                 </Link>
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}

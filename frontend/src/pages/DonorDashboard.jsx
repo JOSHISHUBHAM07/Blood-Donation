@@ -148,9 +148,9 @@ export default function DonorDashboard() {
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-lg font-bold text-gray-800">Active Donations</h2>
-                            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                                onClick={() => setShowScheduleModal(true)}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all">
+                            <motion.button whileHover={available ? { scale: 1.04 } : {}} whileTap={available ? { scale: 0.96 } : {}}
+                                onClick={() => available ? setShowScheduleModal(true) : toast.error('You must be available to schedule a donation')}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm shadow-md transition-all ${available ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white hover:shadow-lg' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
                                 <Plus className="w-4 h-4" /> Schedule Donation
                             </motion.button>
                         </div>
@@ -161,7 +161,7 @@ export default function DonorDashboard() {
                             <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
                                 <Heart className="w-12 h-12 text-gray-200 mx-auto mb-3" />
                                 <p className="text-gray-400 font-medium">No active donations</p>
-                                <button onClick={() => setShowScheduleModal(true)} className="mt-4 text-rose-500 font-semibold text-sm hover:underline">+ Schedule a donation</button>
+                                <button onClick={() => available ? setShowScheduleModal(true) : toast.error('You must be available to schedule a donation')} className={`mt-4 font-semibold text-sm ${available ? 'text-rose-500 hover:underline' : 'text-gray-400 cursor-not-allowed'}`}>+ Schedule a donation</button>
                             </div>
                         ) : (
                             <div className="space-y-4">

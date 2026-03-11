@@ -161,14 +161,14 @@ export default function AdminDashboard() {
     ] : [];
 
     const sortedRequests = [...(requests || [])]
-        .filter(r => !['Completed', 'Cancelled'].includes(r.status))
+        .filter(r => !['Completed', 'Cancelled', 'Rejected'].includes(r.status))
         .sort((a, b) => {
             // Keep existing sort logic if needed, but since Completed is filtered out, sorting by it is moot
             return 0;
         });
 
     const sortedDonations = [...(donations || [])]
-        .filter(d => !['Completed', 'Cancelled'].includes(d.status))
+        .filter(d => !['Completed', 'Cancelled', 'Rejected'].includes(d.status))
         .sort((a, b) => {
             return 0;
         });
