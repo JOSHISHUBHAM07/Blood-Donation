@@ -191,9 +191,9 @@ export default function DonorDashboard() {
                 );
             })()}
 
-            {/* Donation History — only Rejected */}
+            {/* Donation History */}
             {activeTab === 'history' && (() => {
-                const historyDonations = donations.filter(d => d.status === 'Rejected');
+                const historyDonations = donations.filter(d => ['Completed', 'Rejected', 'Cancelled'].includes(d.status));
                 return (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         <div className="flex justify-between items-center mb-4">
@@ -214,8 +214,8 @@ export default function DonorDashboard() {
                                         transition={{ delay: i * 0.05 }}
                                         className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-wrap items-center justify-between gap-3 opacity-80">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm bg-gray-50">
-                                                ❌
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm ${d.status === 'Completed' ? 'bg-emerald-50' : 'bg-gray-50'}`}>
+                                                {d.status === 'Completed' ? '✅' : '❌'}
                                             </div>
                                             <div>
                                                 <div className="font-bold text-gray-800 flex items-center gap-2">
@@ -239,7 +239,7 @@ export default function DonorDashboard() {
             <AnimatePresence>
                 {showScheduleModal && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
                         onClick={e => e.target === e.currentTarget && setShowScheduleModal(false)}>
                         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
                             className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
