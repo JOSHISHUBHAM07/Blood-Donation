@@ -119,12 +119,16 @@ const Navbar = () => {
                         <div className="px-4 py-5 space-y-2 flex flex-col">
                             {user ? (
                                 <>
-                                    <div className="pb-3 border-b border-gray-100 mb-1 flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-extrabold text-lg shadow">
-                                            {user.name?.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <span className="block text-sm font-bold text-gray-800">{user.name}</span>
+                                <div className="pb-3 border-b border-gray-100 mb-1 flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-extrabold text-lg shadow overflow-hidden">
+                                        {user.profilePic ? (
+                                            <img src={user.profilePic} alt={user.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            user.name?.charAt(0).toUpperCase()
+                                        )}
+                                    </div>
+                                    <div>
+                                        <span className="block text-sm font-bold text-gray-800">{user.name}</span>
                                             <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase tracking-wide ${getRoleBadgeColor()}`}>{user.role}</span>
                                         </div>
                                     </div>

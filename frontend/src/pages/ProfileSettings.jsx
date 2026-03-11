@@ -15,6 +15,7 @@ export default function ProfileSettings() {
         address: user?.address || '',
         bloodGroup: user?.bloodGroup || '',
         password: '',
+        profilePic: user?.profilePic || '',
         isAvailable: user?.isAvailable ?? true
     });
 
@@ -27,6 +28,7 @@ export default function ProfileSettings() {
                 contact: user.contact || '',
                 address: user.address || '',
                 bloodGroup: user.bloodGroup || '',
+                profilePic: user.profilePic || '',
                 isAvailable: user.isAvailable ?? true,
             }));
         }
@@ -48,6 +50,21 @@ export default function ProfileSettings() {
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('Image size must be less than 5MB');
+                return;
+            }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, profilePic: reader.result }));
+            };
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         const dataToSubmit = { ...formData };
@@ -58,11 +75,21 @@ export default function ProfileSettings() {
     return (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-4xl mx-auto py-8 px-4">
             <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-                <div className="bg-gradient-to-r from-rose-500 to-pink-600 p-8 flex items-center gap-6">
-                    <div className="w-24 h-24 rounded-full bg-white/20 border-4 border-white backdrop-blur-md flex items-center justify-center text-4xl font-extrabold text-white shadow-lg">
-                        {user?.name?.charAt(0).toUpperCase()}
+                <div className="bg-gradient-to-r from-rose-500 to-pink-600 p-8 flex flex-col items-center md:items-start md:flex-row gap-6">
+                    <div className="relative group">
+                        <div className="w-24 h-24 rounded-full bg-white/20 border-4 border-white backdrop-blur-md flex items-center justify-center text-4xl font-extrabold text-white shadow-lg overflow-hidden">
+                            {formData.profilePic ? (
+                                <img src={formData.profilePic} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                user?.name?.charAt(0).toUpperCase()
+                            )}
+                        </div>
+                        <label className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <span className="text-white text-xs font-bold">Edit</span>
+                            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                        </label>
                     </div>
-                    <div>
+                    <div className="text-center md:text-left">
                         <h1 className="text-3xl font-extrabold text-white">{user?.name}</h1>
                         <p className="text-rose-100 flex items-center gap-2 mt-1 font-medium">
                             <Shield className="w-4 h-4" /> {user?.role?.toUpperCase()}

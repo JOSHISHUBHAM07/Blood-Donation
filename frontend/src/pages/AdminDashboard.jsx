@@ -160,17 +160,18 @@ export default function AdminDashboard() {
         { label: 'Completed', value: dashboard.completedRequests, icon: TrendingUp, color: 'from-teal-500 to-teal-600' },
     ] : [];
 
-    const sortedRequests = [...(requests || [])].sort((a, b) => {
-        if (a.status === 'Completed' && b.status !== 'Completed') return 1;
-        if (a.status !== 'Completed' && b.status === 'Completed') return -1;
-        return 0;
-    });
+    const sortedRequests = [...(requests || [])]
+        .filter(r => !['Completed', 'Cancelled'].includes(r.status))
+        .sort((a, b) => {
+            // Keep existing sort logic if needed, but since Completed is filtered out, sorting by it is moot
+            return 0;
+        });
 
-    const sortedDonations = [...(donations || [])].sort((a, b) => {
-        if (a.status === 'Completed' && b.status !== 'Completed') return 1;
-        if (a.status !== 'Completed' && b.status === 'Completed') return -1;
-        return 0;
-    });
+    const sortedDonations = [...(donations || [])]
+        .filter(d => !['Completed', 'Cancelled'].includes(d.status))
+        .sort((a, b) => {
+            return 0;
+        });
 
     const paginatedRequests = sortedRequests.slice((requestsPage - 1) * itemsPerPage, requestsPage * itemsPerPage);
     const totalRequestPages = Math.max(1, Math.ceil(sortedRequests.length / itemsPerPage));
@@ -253,7 +254,7 @@ export default function AdminDashboard() {
             {activeTab === 'requests' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-                        <h2 className="text-lg font-bold text-gray-800">All Blood Requests <span className="text-gray-400 font-normal text-sm">({requests.length})</span></h2>
+                        <h2 className="text-lg font-bold text-gray-800">Active Blood Requests <span className="text-gray-400 font-normal text-sm">({sortedRequests.length})</span></h2>
                         <div className="flex items-center gap-3">
                             <button onClick={() => downloadCSV('requests')} className="flex items-center gap-1.5 text-sm bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors font-semibold">
                                 <Download className="w-4 h-4" /> Export CSV
@@ -323,7 +324,7 @@ export default function AdminDashboard() {
             {activeTab === 'donations' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-                        <h2 className="text-lg font-bold text-gray-800">All Donor Donations <span className="text-gray-400 font-normal text-sm">({donations.length})</span></h2>
+                        <h2 className="text-lg font-bold text-gray-800">Active Donor Donations <span className="text-gray-400 font-normal text-sm">({sortedDonations.length})</span></h2>
                         <div className="flex items-center gap-3">
                             <button onClick={() => downloadCSV('donations')} className="flex items-center gap-1.5 text-sm bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors font-semibold">
                                 <Download className="w-4 h-4" /> Export CSV

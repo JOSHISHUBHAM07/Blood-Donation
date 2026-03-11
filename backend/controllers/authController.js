@@ -50,6 +50,7 @@ const registerUser = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 bloodGroup: user.bloodGroup,
+                profilePic: user.profilePic,
                 isVerified: user.isVerified,
                 token: generateToken(user._id),
             });
@@ -95,6 +96,7 @@ const loginUser = async (req, res) => {
             bloodGroup: user.bloodGroup,
             contact: user.contact,
             address: user.address,
+            profilePic: user.profilePic,
             isAvailable: user.isAvailable,
             lastDonationDate: user.lastDonationDate,
             isVerified: user.isVerified,
@@ -127,6 +129,9 @@ const updateUserProfile = async (req, res) => {
             user.contact = req.body.contact || user.contact;
             user.address = req.body.address || user.address;
             user.bloodGroup = req.body.bloodGroup || user.bloodGroup;
+            if (req.body.profilePic !== undefined) {
+                user.profilePic = req.body.profilePic;
+            }
             if (req.body.isAvailable !== undefined) {
                 user.isAvailable = req.body.isAvailable;
             }
@@ -146,6 +151,7 @@ const updateUserProfile = async (req, res) => {
                 bloodGroup: updatedUser.bloodGroup,
                 contact: updatedUser.contact,
                 address: updatedUser.address,
+                profilePic: updatedUser.profilePic,
                 isAvailable: updatedUser.isAvailable,
                 lastDonationDate: updatedUser.lastDonationDate,
                 isVerified: updatedUser.isVerified,

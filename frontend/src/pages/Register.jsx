@@ -27,7 +27,7 @@ const Register = () => {
         e.preventDefault();
 
         // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(formData.email.trim())) {
             toast.error('Please enter a valid email address');
             return;

@@ -16,10 +16,15 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         trim: true,
+        match: [/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/, 'Please enter a valid email address'],
     },
     password: {
         type: String,
         required: true,
+    },
+    profilePic: {
+        type: String,
+        default: '',
     },
     bloodGroup: {
         type: String,

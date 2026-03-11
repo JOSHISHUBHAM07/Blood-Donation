@@ -45,7 +45,7 @@ const cardVariants = {
 };
 
 // Validation helpers
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email.trim());
 const isValidPhone = (phone) => /^\d{10}$/.test(phone.replace(/\D/g, ''));
 const isValidContact = (contact) => {
     const trimmed = contact.trim();
@@ -135,8 +135,6 @@ export default function PatientDashboard() {
         } catch {
             // Silently ignore geocoding errors – user can still type manually
         }
-    };
-
     const stats = {
         total: requests.length,
         pending: requests.filter(r => r.status === 'Pending').length,
