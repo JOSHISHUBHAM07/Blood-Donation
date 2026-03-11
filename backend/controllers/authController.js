@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
         if (user) {
             logger.info(`New user registered: ${user.email} (${user.role})`);
 
-            // Send Welcome Email asynchronously
+            
             sendEmail({
                 email: user.email,
                 ...generateWelcomeEmail(user.name)
@@ -82,7 +82,7 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Update lastLogin
+        
         user.lastLogin = new Date();
         await user.save();
 

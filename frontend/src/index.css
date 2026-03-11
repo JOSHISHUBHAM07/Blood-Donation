@@ -21,7 +21,7 @@
 
 @layer components {
 
-  /* Glassmorphism utility classes */
+  
   .glass-card {
     @apply bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);

@@ -4,24 +4,24 @@ const User = require('../models/User.js');
 const logger = require('../utils/logger.js');
 const { sendEmail, generateUrgentRequestEmail } = require('../utils/emailService.js');
 
-// Priority Score Engine
-// Emergency Level: Critical=40, High=30, Medium=20, Low=10
-// Urgency (days until required): <1d=30, <3d=20, <7d=10, else=0
-// Blood stock: 0 units=20, <5=10, else=0
+
+
+
+
 const computePriorityScore = async (emergencyLevel, requiredDate, bloodGroup) => {
     let score = 0;
 
-    // Emergency weight
+    
     const emergencyWeights = { Critical: 40, High: 30, Medium: 20, Low: 10 };
     score += emergencyWeights[emergencyLevel] || 10;
 
-    // Urgency weight
+    
     const daysUntilRequired = Math.ceil((new Date(requiredDate) - new Date()) / (1000 * 60 * 60 * 24));
     if (daysUntilRequired <= 1) score += 30;
     else if (daysUntilRequired <= 3) score += 20;
     else if (daysUntilRequired <= 7) score += 10;
 
-    // Stock scarcity
+    
     const stock = await BloodStock.findOne({ bloodGroup });
     const units = stock ? stock.unitsAvailable : 0;
     if (units === 0) score += 20;
@@ -50,11 +50,11 @@ const createBloodRequest = async (req, res) => {
 
         logger.info(`Blood request created by ${req.user.email}: ${bloodGroup} (priority: ${priorityScore})`);
 
-        // Asynchronously notify matching donors if request is urgent
+        
         if (['High', 'Critical'].includes(emergencyLevel)) {
             const donors = await User.find({ role: 'donor', bloodGroup, isActive: true });
             donors.forEach(donor => {
-                // Ensure we don't block the request if emails fail
+                
                 sendEmail({
                     email: donor.email,
                     ...generateUrgentRequestEmail(hospital, bloodGroup, quantity, req.user.name || 'A patient')
@@ -123,8 +123,8 @@ const completeRequest = async (req, res) => {
             timestamp: new Date(),
         });
 
-        // Deduct stock if it was Approved (from blood bank)
-        // If it was Donor Assigned, it's assumed the donor gave blood directly or to the bank, stock handling depends on donor flow, but to mirror admin we deduct if possible
+        
+        
         if (oldStatus !== 'Completed') {
             const stock = await BloodStock.findOne({ bloodGroup: request.bloodGroup });
             if (stock && oldStatus === 'Approved') {

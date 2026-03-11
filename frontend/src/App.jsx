@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Pages
+
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,14 +16,14 @@ import DonorDashboard from './pages/DonorDashboard';
 import ProfileSettings from './pages/ProfileSettings';
 import NotFound from './pages/NotFound';
 
-// Scroll to top on every route change
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [pathname]);
   return null;
 };
 
-// Animated Background Component
+
 const BackgroundBlobs = () => (
   <div className="fixed inset-0 pointer-events-none z-0">
     <motion.div

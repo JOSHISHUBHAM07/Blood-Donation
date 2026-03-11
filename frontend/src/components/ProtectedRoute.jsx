@@ -1,12 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 
-/**
- * ProtectedRoute
- * - If not authenticated → redirect to /login
- * - If authenticated but wrong role → redirect to /
- * - role prop is optional; if omitted, only auth is checked
- */
 const ProtectedRoute = ({ children, role }) => {
     const { user } = useSelector((state) => state.auth);
 
@@ -19,6 +14,11 @@ const ProtectedRoute = ({ children, role }) => {
     }
 
     return children;
+};
+
+ProtectedRoute.propTypes = {
+    children: PropTypes.node.isRequired,
+    role: PropTypes.string,
 };
 
 export default ProtectedRoute;

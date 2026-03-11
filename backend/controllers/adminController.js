@@ -6,7 +6,7 @@ const AuditLog = require('../models/AuditLog.js');
 const logger = require('../utils/logger.js');
 const { sendEmail, generateStatusUpdateEmail } = require('../utils/emailService.js');
 
-// ─── Dashboard ───────────────────────────────────────────────────────────────
+
 const getDashboardData = async (req, res) => {
     try {
         const [
@@ -50,7 +50,7 @@ const getDashboardData = async (req, res) => {
     }
 };
 
-// ─── Blood Stock ──────────────────────────────────────────────────────────────
+
 const updateBloodStock = async (req, res) => {
     const { bloodGroup, unitsAvailable } = req.body;
     try {
@@ -94,7 +94,7 @@ const getBloodStock = async (req, res) => {
     }
 };
 
-// ─── Requests ─────────────────────────────────────────────────────────────────
+
 const getAllRequests = async (req, res) => {
     try {
         const requests = await Request.find({})
@@ -122,7 +122,7 @@ const updateRequestStatus = async (req, res) => {
         request.status = status || request.status;
         if (assignedDonorId) request.assignedDonorId = assignedDonorId;
 
-        // Append to approval log
+        
         request.approvalLogs.push({
             status: request.status,
             changedBy: req.user._id,
@@ -130,7 +130,7 @@ const updateRequestStatus = async (req, res) => {
             timestamp: new Date(),
         });
 
-        // Auto-deduct stock on completion
+        
         if (status === 'Completed' && oldStatus !== 'Completed') {
             const stock = await BloodStock.findOne({ bloodGroup: request.bloodGroup });
             if (stock) {
@@ -145,7 +145,7 @@ const updateRequestStatus = async (req, res) => {
 
         const updatedRequest = await request.save();
 
-        // Audit log
+        
         await AuditLog.create({
             userId: req.user._id,
             role: req.user.role,
@@ -157,7 +157,7 @@ const updateRequestStatus = async (req, res) => {
             metadata: { note },
         });
 
-        // Send status update email securely
+        
         if (request.status !== oldStatus && request.patientId?.email) {
             sendEmail({
                 email: request.patientId.email,
@@ -173,7 +173,7 @@ const updateRequestStatus = async (req, res) => {
     }
 };
 
-// ─── Donations ────────────────────────────────────────────────────────────────
+
 const getAllDonations = async (req, res) => {
     try {
         const donations = await Donation.find({})
@@ -200,7 +200,7 @@ const updateDonationStatus = async (req, res) => {
 
         const updatedDonation = await donation.save();
 
-        // Audit log
+        
         await AuditLog.create({
             userId: req.user._id,
             role: req.user.role,
@@ -219,7 +219,7 @@ const updateDonationStatus = async (req, res) => {
     }
 };
 
-// ─── Users ────────────────────────────────────────────────────────────────────
+
 const getUsers = async (req, res) => {
     try {
         const { role } = req.query;
@@ -258,7 +258,7 @@ const toggleUserStatus = async (req, res) => {
     }
 };
 
-// ─── Audit Logs ───────────────────────────────────────────────────────────────
+
 const getAuditLogs = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;

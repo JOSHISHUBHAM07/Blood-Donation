@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import {
-    Heart, Calendar, CheckCircle2, AlertCircle, Clock, Loader2,
+    Heart, CheckCircle2, AlertCircle, Clock, Loader2,
     ToggleLeft, ToggleRight, Plus, X, MapPin
 } from 'lucide-react';
 import {
@@ -65,7 +65,7 @@ export default function DonorDashboard() {
         dispatch(scheduleDonation(form));
     };
 
-    // Reverse geocode lat/lng to auto-fill donor location
+    
     const handleDonorMapSelect = async (loc) => {
         try {
             const res = await fetch(
@@ -91,7 +91,7 @@ export default function DonorDashboard() {
 
     return (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-6xl mx-auto">
-            {/* Header */}
+            {}
             <motion.div variants={cardVariants} custom={0} initial="hidden" animate="show" className="mb-8">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function DonorDashboard() {
                             <p className="text-gray-500 text-sm">Blood group: <span className="font-bold text-rose-600">{user?.bloodGroup || '—'}</span></p>
                         </div>
                     </div>
-                    {/* Availability Toggle */}
+                    {}
                     <button onClick={handleToggleAvailability}
                         className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm border-2 transition-all ${available ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
                         {available ? <ToggleRight className="w-5 h-5 text-emerald-500" /> : <ToggleLeft className="w-5 h-5 text-gray-400" />}
@@ -112,7 +112,7 @@ export default function DonorDashboard() {
                 </div>
             </motion.div>
 
-            {/* Stats */}
+            {}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
                     { label: 'Total Donations', value: stats.total, icon: Heart, color: 'from-rose-500 to-pink-500' },
@@ -131,7 +131,7 @@ export default function DonorDashboard() {
                 ))}
             </div>
 
-            {/* Tabs */}
+            {}
             <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit flex-wrap">
                 {['active', 'history'].map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)}
@@ -141,7 +141,7 @@ export default function DonorDashboard() {
                 ))}
             </div>
 
-            {/* Active Donations */}
+            {}
             {activeTab === 'active' && (() => {
                 const activeDonations = donations.filter(d => ['Pending', 'Approved', 'Scheduled'].includes(d.status));
                 return (
@@ -191,7 +191,7 @@ export default function DonorDashboard() {
                 );
             })()}
 
-            {/* Donation History */}
+            {}
             {activeTab === 'history' && (() => {
                 const historyDonations = donations.filter(d => ['Completed', 'Rejected', 'Cancelled'].includes(d.status));
                 return (
@@ -235,7 +235,7 @@ export default function DonorDashboard() {
                 );
             })()}
 
-            {/* Schedule Donation Modal */}
+            {}
             <AnimatePresence>
                 {showScheduleModal && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

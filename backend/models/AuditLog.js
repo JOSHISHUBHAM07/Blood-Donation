@@ -14,12 +14,12 @@ const auditLogSchema = new mongoose.Schema({
     actionType: {
         type: String,
         required: true,
-        // e.g. 'REQUEST_STATUS_UPDATE', 'STOCK_UPDATE', 'USER_STATUS_TOGGLE'
+        
     },
     affectedEntity: {
         type: String,
         required: true,
-        // e.g. 'Request', 'BloodStock', 'User'
+        
     },
     entityId: {
         type: mongoose.Schema.Types.ObjectId,

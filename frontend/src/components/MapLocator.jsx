@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icons
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -22,7 +22,6 @@ export default function MapLocator({ onLocationSelect, initialPosition }) {
     useEffect(() => {
         if (!mapContainerRef.current || mapInstance.current) return;
 
-        // Initialize map
         const defaultCenter = initialPosition || { lat: 51.505, lng: -0.09 };
         mapInstance.current = L.map(mapContainerRef.current).setView([defaultCenter.lat, defaultCenter.lng], 13);
 
@@ -34,7 +33,6 @@ export default function MapLocator({ onLocationSelect, initialPosition }) {
             markerInstance.current = L.marker([initialPosition.lat, initialPosition.lng]).addTo(mapInstance.current);
         }
 
-        // Handle clicks
         mapInstance.current.on('click', (e) => {
             const { lat, lng } = e.latlng;
             if (markerInstance.current) {
@@ -47,7 +45,6 @@ export default function MapLocator({ onLocationSelect, initialPosition }) {
             }
         });
 
-        // Try geolocation on mount if no initial position
         if (!initialPosition && navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
@@ -67,11 +64,10 @@ export default function MapLocator({ onLocationSelect, initialPosition }) {
                 mapInstance.current = null;
             }
         };
-    }, []); // Only run once on mount
+    }, [initialPosition, onLocationSelect]);
 
     return (
         <div className="relative w-full rounded-xl overflow-hidden border border-gray-200 shadow-sm" style={{ height: '220px' }}>
-            {/* Instruction overlay */}
             <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 bg-black/60 text-white text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm pointer-events-none flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-rose-400 rounded-full animate-pulse inline-block" />
                 Click map to pin your location
@@ -80,3 +76,11 @@ export default function MapLocator({ onLocationSelect, initialPosition }) {
         </div>
     );
 }
+
+MapLocator.propTypes = {
+    onLocationSelect: PropTypes.func,
+    initialPosition: PropTypes.shape({
+        lat: PropTypes.number,
+        lng: PropTypes.number,
+    }),
+};

@@ -11,7 +11,7 @@ export default function NotFound() {
             transition={{ duration: 0.4 }}
             className="min-h-[75vh] flex flex-col items-center justify-center p-4 text-center"
         >
-            {/* Icon */}
+            {}
             <motion.div
                 animate={{ y: [0, -12, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -20,7 +20,7 @@ export default function NotFound() {
                 <AlertTriangle className="w-14 h-14 text-rose-500" />
             </motion.div>
 
-            {/* 404 */}
+            {}
             <h1 className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 mb-2 leading-none">
                 404
             </h1>
@@ -28,7 +28,7 @@ export default function NotFound() {
             <h2 className="text-2xl font-bold text-gray-800 mb-3">Page Not Found</h2>
 
             <p className="text-gray-500 max-w-sm mx-auto mb-8 leading-relaxed">
-                Oops! The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+                Oops! The page you&apos;re looking for doesn&apos;t exist or has been moved. Let&apos;s get you back on track.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">

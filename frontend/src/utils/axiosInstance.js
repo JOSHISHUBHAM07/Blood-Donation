@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
     },
 });
 
-// Attach JWT token to every request
+
 axiosInstance.interceptors.request.use(
     (config) => {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -21,7 +21,7 @@ axiosInstance.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Handle 401 globally
+
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {

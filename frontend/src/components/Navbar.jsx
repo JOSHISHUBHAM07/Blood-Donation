@@ -37,7 +37,7 @@ const Navbar = () => {
         <nav className="glass-nav z-0">
             <div className="container mx-auto px-4">
                 <div className="flex justify-between items-center h-16">
-                    {/* Brand */}
+                    {}
                     <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center space-x-2 text-xl font-bold tracking-wider text-primary group">
                         <motion.div whileHover={{ scale: 1.1, rotate: 10 }} whileTap={{ scale: 0.9 }}>
                             <Droplet className="w-8 h-8 fill-primary stroke-primary drop-shadow-sm group-hover:fill-secondary transition-colors" />
@@ -45,7 +45,7 @@ const Navbar = () => {
                         <span className="group-hover:text-secondary transition-colors">Life Flow</span>
                     </Link>
 
-                    {/* Desktop Navigation */}
+                    {}
                     <div className="hidden md:flex space-x-3 items-center">
                         {user ? (
                             <>
@@ -96,7 +96,7 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* Mobile Menu Button */}
+                    {}
                     <div className="md:hidden flex items-center">
                         <motion.button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -113,7 +113,7 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Mobile Navigation Menu */}
+            {}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div

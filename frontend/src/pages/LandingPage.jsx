@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
     Heart,
@@ -99,7 +99,7 @@ const LandingPage = () => {
     return (
         <div ref={pageRef} className="relative w-full flex flex-col items-center">
 
-            {/* ─── Floating Scroll-to-Bottom Button ─── */}
+            {}
             <motion.button
                 onClick={scrollToBottom}
                 initial={{ opacity: 0, x: 40 }}
@@ -116,10 +116,10 @@ const LandingPage = () => {
                 <span className="text-[10px] font-semibold text-gray-400 group-hover:text-primary transition-colors uppercase tracking-widest">Scroll</span>
             </motion.button>
 
-            {/* ─── HERO ─── */}
+            {}
             <div className="relative min-h-screen flex flex-col items-center justify-center w-full px-4 pt-16 pb-10">
 
-                {/* Animated background orbs */}
+                {}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden">
                     <motion.div
                         animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -144,14 +144,14 @@ const LandingPage = () => {
                     animate="show"
                     className="text-center max-w-4xl mx-auto relative z-10"
                 >
-                    {/* Pill badge */}
+                    {}
                     <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-primary/10 to-rose-100 border border-primary/20 text-primary font-semibold text-sm mb-8 shadow-sm">
                         <Sparkles className="w-4 h-4 text-rose-400" />
                         <span>Every Drop Counts — Save Lives Today</span>
                         <Sparkles className="w-4 h-4 text-rose-400" />
                     </motion.div>
 
-                    {/* Headline */}
+                    {}
                     <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-6 leading-[1.1]">
                         Give the Gift of{' '}
                         <span className="relative inline-block">
@@ -172,7 +172,7 @@ const LandingPage = () => {
                         Join our community of heroes — <strong className="text-gray-700">a single donation can save up to three lives.</strong>
                     </motion.p>
 
-                    {/* CTA buttons */}
+                    {}
                     <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
                             to="/register"
@@ -190,7 +190,7 @@ const LandingPage = () => {
                         </Link>
                     </motion.div>
 
-                    {/* Stats strip */}
+                    {}
                     <motion.div variants={itemVariants} className="mt-16 flex flex-wrap justify-center gap-6 md:gap-12">
                         {[
                             { value: '10K+', label: 'Registered Donors' },
@@ -206,7 +206,7 @@ const LandingPage = () => {
                 </motion.div>
             </div>
 
-            {/* ─── Wave Divider ─── */}
+            {}
             <div className="w-full -mt-2 overflow-hidden leading-none">
                 <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-16">
                     <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="url(#waveGrad)" fillOpacity="0.18" />
@@ -219,7 +219,7 @@ const LandingPage = () => {
                 </svg>
             </div>
 
-            {/* ─── OUR SERVICES ─── */}
+            {}
             <motion.section
                 variants={sectionVariants}
                 initial="hidden"
@@ -227,7 +227,7 @@ const LandingPage = () => {
                 viewport={{ once: true, margin: '-80px' }}
                 className="w-full max-w-6xl px-4 py-20 relative z-10"
             >
-                {/* Section header */}
+                {}
                 <div className="text-center mb-16">
                     <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
                         <Droplet className="w-4 h-4 fill-primary" /> Our Services
@@ -241,7 +241,7 @@ const LandingPage = () => {
                     </p>
                 </div>
 
-                {/* Cards */}
+                {}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {services.map((s, i) => {
                         const Icon = s.icon;
@@ -254,17 +254,17 @@ const LandingPage = () => {
                                 transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                                 className={`group relative rounded-3xl p-7 bg-white border ${s.border} shadow-sm hover:shadow-xl ${s.glow} transition-all duration-400 hover:-translate-y-2 cursor-default overflow-hidden`}
                             >
-                                {/* Card number watermark */}
+                                {}
                                 <span className="absolute top-4 right-5 text-7xl font-black text-gray-100 select-none leading-none">
                                     {String(i + 1).padStart(2, '0')}
                                 </span>
 
-                                {/* Badge */}
+                                {}
                                 <span className={`inline-block px-3 py-0.5 rounded-full text-xs font-bold mb-5 ${s.badgeColor}`}>
                                     {s.badge}
                                 </span>
 
-                                {/* Icon */}
+                                {}
                                 <div className={`w-14 h-14 ${s.bg} rounded-2xl flex items-center justify-center mb-5 ${s.color} group-hover:scale-110 transition-transform duration-300 shadow-inner`}>
                                     <Icon className="w-7 h-7" />
                                 </div>
@@ -277,7 +277,7 @@ const LandingPage = () => {
                 </div>
             </motion.section>
 
-            {/* ─── WHY CHOOSE ─── */}
+            {}
             <motion.section
                 variants={sectionVariants}
                 initial="hidden"
@@ -286,12 +286,12 @@ const LandingPage = () => {
                 className="w-full max-w-6xl px-4 py-20 relative z-10"
             >
                 <div className="rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 md:p-16 relative overflow-hidden shadow-2xl">
-                    {/* Bg decorations */}
+                    {}
                     <div className="absolute -top-20 -left-20 w-72 h-72 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-primary/30 to-transparent rounded-full pointer-events-none" />
                     <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-rose-500/20 to-transparent rounded-full pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
-                        {/* Text */}
+                        {}
                         <div className="w-full lg:w-1/2">
                             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-semibold mb-6">
                                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> Why Choose Life Flow?
@@ -328,7 +328,7 @@ const LandingPage = () => {
                             </div>
                         </div>
 
-                        {/* Feature mini-cards grid */}
+                        {}
                         <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4">
                             {features.map((f, i) => {
                                 const FIcon = f.icon;
@@ -350,7 +350,7 @@ const LandingPage = () => {
                 </div>
             </motion.section>
 
-            {/* ─── ABOUT US ─── */}
+            {}
             <motion.section
                 ref={bottomRef}
                 variants={sectionVariants}
@@ -359,7 +359,7 @@ const LandingPage = () => {
                 viewport={{ once: true, margin: '-80px' }}
                 className="w-full max-w-5xl px-4 py-20 text-center relative z-10 mb-10"
             >
-                {/* Decorative icon ring */}
+                {}
                 <div className="relative inline-flex items-center justify-center w-20 h-20 mb-8">
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-rose-200/30 animate-pulse" />
                     <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center border border-primary/10">
@@ -386,7 +386,7 @@ const LandingPage = () => {
                 </Link>
             </motion.section>
 
-            {/* Bottom glow */}
+            {}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-40 bg-[radial-gradient(ellipse,_var(--tw-gradient-stops))] from-primary/10 to-transparent rounded-full pointer-events-none" />
         </div>
     );

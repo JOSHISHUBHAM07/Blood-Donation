@@ -56,7 +56,7 @@ const requestSchema = new mongoose.Schema({
     medicalReason: {
         type: String
     },
-    // Enterprise fields
+    
     priorityScore: {
         type: Number,
         default: 0
@@ -64,7 +64,7 @@ const requestSchema = new mongoose.Schema({
     approvalLogs: [approvalLogSchema],
 }, { timestamps: true });
 
-// Indexes for performance
+
 requestSchema.index({ bloodGroup: 1 });
 requestSchema.index({ status: 1 });
 requestSchema.index({ createdAt: -1 });

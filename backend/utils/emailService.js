@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // You can change this to your preferred service
+    service: 'gmail', 
     auth: {
         user: process.env.EMAIL_USER || 'test@example.com',
         pass: process.env.EMAIL_PASS || 'password',
@@ -24,12 +24,12 @@ const sendEmail = async (options) => {
         return true;
     } catch (error) {
         console.error(`Email Error: ${error.message}`);
-        // Return false instead of throwing so we don't crash requests if email fails
+        
         return false;
     }
 };
 
-// --- Templates ---
+
 
 const generateWelcomeEmail = (name) => {
     return {

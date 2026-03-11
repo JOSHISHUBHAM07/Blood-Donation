@@ -52,9 +52,9 @@ const Login = () => {
         >
             <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-white/40">
 
-                {/* Left — Dark Brand Panel */}
+                {}
                 <div className="relative hidden md:flex flex-col justify-between p-10 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
-                    {/* Orbs */}
+                    {}
                     <div className="absolute -top-10 -left-10 w-48 h-48 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-primary/30 to-transparent rounded-full pointer-events-none" />
                     <div className="absolute bottom-10 right-0 w-40 h-40 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-rose-500/20 to-transparent rounded-full pointer-events-none" />
 
@@ -88,7 +88,7 @@ const Login = () => {
                     </div>
                 </div>
 
-                {/* Right — Form Panel */}
+                {}
                 <div className="bg-white/80 backdrop-blur-xl p-6 md:p-10 flex flex-col justify-center">
                     <div className="mb-6 md:mb-8">
                         <span className="text-4xl mb-3 inline-block">🩸</span>
@@ -151,7 +151,7 @@ const Login = () => {
                     </form>
 
                     <p className="mt-6 text-center text-sm text-gray-500">
-                        Don't have an account?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link to="/register" className="text-primary font-bold hover:text-rose-600 transition-colors">
                             Register here
                         </Link>

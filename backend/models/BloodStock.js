@@ -18,7 +18,7 @@ const bloodStockSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Pre-save middleware to update lastUpdated
+
 bloodStockSchema.pre('save', function () {
     this.lastUpdated = Date.now();
 });

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Droplet, Heart, Mail, Github, Shield } from 'lucide-react';
+import { Droplet, Heart, Mail, Shield } from 'lucide-react';
 
 const Footer = () => {
     return (
         <footer className="mt-auto bg-white/20 backdrop-blur-sm border-t border-white/40 z-0">
             <div className="container mx-auto px-4 py-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                    {/* Brand */}
+                    {}
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <Droplet className="w-6 h-6 fill-primary stroke-primary" />
@@ -17,7 +17,7 @@ const Footer = () => {
                         </p>
                     </div>
 
-                    {/* Quick Links */}
+                    {}
                     <div>
                         <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">Quick Links</h4>
                         <ul className="space-y-2 text-sm text-gray-500">
@@ -27,7 +27,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Info */}
+                    {}
                     <div>
                         <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-3">About</h4>
                         <ul className="space-y-2 text-sm text-gray-500">

@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
-    // Enterprise fields
+    
     isVerified: {
         type: Boolean,
         default: false,
@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
-// Index for common queries
+
 userSchema.index({ role: 1 });
 userSchema.index({ bloodGroup: 1 });
 userSchema.index({ isAvailable: 1 });

@@ -7,7 +7,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recha
 import {
     LayoutDashboard, Users, Droplet, Activity, AlertTriangle,
     CheckCircle, Clock, Shield, ClipboardList, Loader2,
-    ChevronDown, X, RefreshCw, TrendingUp, Settings,
+    X, RefreshCw, TrendingUp,
     Download, ChevronLeft, ChevronRight, Heart
 } from 'lucide-react';
 import {
@@ -20,7 +20,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const PIE_COLORS = ['#f43f5e', '#fb923c', '#facc15', '#4ade80', '#60a5fa', '#a78bfa', '#f472b6', '#34d399'];
 
-const statusOptions = ['Pending', 'Approved', 'Donor Assigned', 'Completed', 'Rejected'];
+
 
 const statusColors = {
     Pending: 'bg-amber-100 text-amber-700',
@@ -44,7 +44,7 @@ const cardVariants = {
     show: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] } }),
 };
 
-const TABS = ['dashboard', 'requests', 'donations', 'stock', 'users', 'audit'];
+
 
 export default function AdminDashboard() {
     const dispatch = useDispatch();
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
 
     const [activeTab, setActiveTab] = useState('dashboard');
     const [editStock, setEditStock] = useState({});
-    const [statusModal, setStatusModal] = useState(null); // { requestId, currentStatus, type: 'request' | 'donation' }
+    const [statusModal, setStatusModal] = useState(null); 
     const [newStatus, setNewStatus] = useState('');
     const [statusNote, setStatusNote] = useState('');
     const [donorIdInput, setDonorIdInput] = useState('');
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
             link.click();
             link.remove();
             toast.success('Export completed successfully', { id: toastId });
-        } catch (err) {
+        } catch {
             toast.error('Failed to export data');
         }
     };
@@ -184,16 +184,11 @@ export default function AdminDashboard() {
 
     const sortedRequests = [...(requests || [])]
         .filter(r => !['Completed', 'Cancelled', 'Rejected'].includes(r.status))
-        .sort((a, b) => {
-            // Keep existing sort logic if needed, but since Completed is filtered out, sorting by it is moot
-            return 0;
-        });
+        .sort(() => 0);
 
     const sortedDonations = [...(donations || [])]
         .filter(d => !['Completed', 'Cancelled', 'Rejected'].includes(d.status))
-        .sort((a, b) => {
-            return 0;
-        });
+        .sort(() => 0);
 
     const paginatedRequests = sortedRequests.slice((requestsPage - 1) * itemsPerPage, requestsPage * itemsPerPage);
     const totalRequestPages = Math.max(1, Math.ceil(sortedRequests.length / itemsPerPage));
@@ -206,7 +201,7 @@ export default function AdminDashboard() {
 
     return (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-7xl mx-auto">
-            {/* Header */}
+            {}
             <motion.div variants={cardVariants} custom={0} initial="hidden" animate="show" className="mb-8">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg">
@@ -219,7 +214,7 @@ export default function AdminDashboard() {
                 </div>
             </motion.div>
 
-            {/* Tabs */}
+            {}
             <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl flex-wrap">
                 {[
                     { key: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
@@ -236,7 +231,7 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            {/* Overview Tab */}
+            {}
             {activeTab === 'dashboard' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
@@ -252,7 +247,7 @@ export default function AdminDashboard() {
                         ))}
                     </div>
 
-                    {/* Blood Stock Chart */}
+                    {}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <h2 className="text-lg font-bold text-gray-800 mb-4">Blood Stock Distribution</h2>
                         {pieData.length === 0 ? (
@@ -272,7 +267,7 @@ export default function AdminDashboard() {
                 </motion.div>
             )}
 
-            {/* Requests Tab */}
+            {}
             {activeTab === 'requests' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
@@ -332,7 +327,7 @@ export default function AdminDashboard() {
                                 </motion.div>
                             ))}
 
-                            {/* Pagination */}
+                            {}
                             {requests.length > itemsPerPage && (
                                 <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-gray-100 mt-4">
                                     <button disabled={requestsPage === 1} onClick={() => setRequestsPage(p => p - 1)} className="p-1 rounded-lg hover:bg-gray-100 disabled:opacity-50">
@@ -349,7 +344,7 @@ export default function AdminDashboard() {
                 </motion.div>
             )}
 
-            {/* Donations Tab */}
+            {}
             {activeTab === 'donations' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
@@ -403,7 +398,7 @@ export default function AdminDashboard() {
                                 </motion.div>
                             ))}
 
-                            {/* Pagination */}
+                            {}
                             {donations.length > itemsPerPage && (
                                 <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-gray-100 mt-4">
                                     <button disabled={donationsPage === 1} onClick={() => setDonationsPage(p => p - 1)} className="p-1 rounded-lg hover:bg-gray-100 disabled:opacity-50">
@@ -420,7 +415,7 @@ export default function AdminDashboard() {
                 </motion.div>
             )}
 
-            {/* Blood Stock Tab */}
+            {}
             {activeTab === 'stock' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="flex justify-between items-center mb-4">
@@ -459,7 +454,7 @@ export default function AdminDashboard() {
                 </motion.div>
             )}
 
-            {/* Users Tab */}
+            {}
             {activeTab === 'users' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="flex justify-between items-center mb-4">
@@ -519,7 +514,7 @@ export default function AdminDashboard() {
                                     </tbody>
                                 </table>
                             </div>
-                            {/* User Pagination */}
+                            {}
                             {users.length > itemsPerPage && (
                                 <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3 bg-gray-50">
                                     <button disabled={usersPage === 1} onClick={() => setUsersPage(p => p - 1)} className="p-1 rounded-lg hover:bg-gray-200 disabled:opacity-50">
@@ -536,7 +531,7 @@ export default function AdminDashboard() {
                 </motion.div>
             )}
 
-            {/* Audit Logs Tab */}
+            {}
             {activeTab === 'audit' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <h2 className="text-lg font-bold text-gray-800 mb-4">Audit Trail <span className="text-gray-400 font-normal text-sm">({auditLogs.total} entries)</span></h2>
@@ -580,7 +575,7 @@ export default function AdminDashboard() {
                 </motion.div>
             )}
 
-            {/* Update Status Modal */}
+            {}
             <AnimatePresence>
                 {statusModal && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

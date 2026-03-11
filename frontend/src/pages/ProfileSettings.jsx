@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { reset, updateProfile } from '../features/auth/authSlice';
 import toast from 'react-hot-toast';
-import { User, Mail, MapPin, Phone, Shield, Droplet, Loader2, Save } from 'lucide-react';
+import { User, Mail, MapPin, Phone, Droplet, Loader2, Save as SaveIcon } from 'lucide-react';
 
 export default function ProfileSettings() {
     const dispatch = useDispatch();
@@ -19,7 +19,7 @@ export default function ProfileSettings() {
         isAvailable: user?.isAvailable ?? true
     });
 
-    // Re-sync form when user data updates in Redux (e.g., after successful save)
+    
     useEffect(() => {
         if (user) {
             setFormData(prev => ({
@@ -86,38 +86,34 @@ export default function ProfileSettings() {
                         </div>
                         <label className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                             <span className="text-white text-xs font-bold">Edit</span>
-                            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                         </label>
                     </div>
-                    <div className="text-center md:text-left">
-                        <h1 className="text-3xl font-extrabold text-white">{user?.name}</h1>
-                        <p className="text-rose-100 flex items-center gap-2 mt-1 font-medium">
-                            <Shield className="w-4 h-4" /> {user?.role?.toUpperCase()}
-                        </p>
+                    <div className="flex-1 text-center md:text-left text-white">
+                        <h2 className="text-3xl font-extrabold">{user?.name}</h2>
+                        <p className="text-rose-100 text-sm opacity-90">{user?.email} · {user?.role}</p>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Static Field */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-1.5 flex items-center gap-2"><Mail className="w-4 h-4 text-gray-400" /> Email Address</label>
                             <input type="email" value={user?.email} disabled
                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed" />
                         </div>
-                        {/* Name Field */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-1.5 flex items-center gap-2"><User className="w-4 h-4 text-gray-400" /> Full Name</label>
                             <input type="text" name="name" value={formData.name} onChange={handleChange}
                                 className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all" />
                         </div>
-                        {/* Contact Field */}
+                        {}
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-1.5 flex items-center gap-2"><Phone className="w-4 h-4 text-gray-400" /> Contact Number</label>
                             <input type="text" name="contact" value={formData.contact} onChange={handleChange}
                                 className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all" />
                         </div>
-                        {/* Blood Group */}
+                        {}
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-1.5 flex items-center gap-2"><Droplet className="w-4 h-4 text-gray-400" /> Blood Group</label>
                             <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange}
@@ -126,13 +122,13 @@ export default function ProfileSettings() {
                                 {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
                             </select>
                         </div>
-                        {/* Address Field */}
+                        {}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-semibold text-gray-600 mb-1.5 flex items-center gap-2"><MapPin className="w-4 h-4 text-gray-400" /> Address</label>
                             <input type="text" name="address" value={formData.address} onChange={handleChange}
                                 className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-rose-300 focus:border-rose-300 outline-none transition-all" />
                         </div>
-                        {/* Password Update */}
+                        {}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-semibold text-gray-600 mb-1.5">New Password (leave blank to keep current)</label>
                             <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••"
@@ -156,7 +152,7 @@ export default function ProfileSettings() {
                     <div className="pt-6 border-t border-gray-100 flex justify-end">
                         <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={isLoading}
                             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white font-bold py-3 px-8 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-70">
-                            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <SaveIcon className="w-5 h-5" />}
                             {isLoading ? 'Saving...' : 'Save Changes'}
                         </motion.button>
                     </div>

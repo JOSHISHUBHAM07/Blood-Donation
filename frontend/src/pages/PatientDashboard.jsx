@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import {
     Droplet, Activity, AlertTriangle, CheckCircle, Clock,
-    Plus, X, Calendar, Hospital, Phone, FileText, ChevronDown, Loader2, MapPin
+    Plus, X, Calendar, Hospital, Phone, FileText, Loader2, MapPin
 } from 'lucide-react';
 import {
     fetchMyRequests, createRequest, cancelRequest,
@@ -44,7 +44,7 @@ const cardVariants = {
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
 };
 
-// Validation helpers
+
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email.trim());
 const isValidPhone = (phone) => /^\d{10}$/.test(phone.replace(/\D/g, ''));
 const isValidContact = (contact) => {
@@ -80,7 +80,7 @@ export default function PatientDashboard() {
         }
     }, [isError, isSuccess, message, isLoading, dispatch]);
 
-    // Get current stock for selected blood group
+    
     const getStockForGroup = (group) => {
         const item = bloodStock.find(s => s.bloodGroup === group);
         return item ? item.unitsAvailable : 0;
@@ -92,12 +92,12 @@ export default function PatientDashboard() {
             toast.error('Please fill all required fields');
             return;
         }
-        // Validate contact
+        
         if (!isValidContact(form.contactDetails)) {
             toast.error('Enter a valid email or 10-digit phone number');
             return;
         }
-        // Blood stock alert
+        
         const available = getStockForGroup(form.bloodGroup);
         if (available < form.quantity) {
             toast(`⚠️ Blood stock for ${form.bloodGroup} is low (${available} units available). We will still process your request.`, {
@@ -118,7 +118,7 @@ export default function PatientDashboard() {
         }
     };
 
-    // Reverse geocode lat/lng to auto-fill hospital name
+    
     const handleMapLocationSelect = async (loc) => {
         setForm(f => ({ ...f, location: loc }));
         try {
@@ -133,7 +133,7 @@ export default function PatientDashboard() {
                 toast.success('Location auto-filled from map!');
             }
         } catch {
-            // Silently ignore geocoding errors – user can still type manually
+            void 0;
         }
     };
 
@@ -144,13 +144,13 @@ export default function PatientDashboard() {
         completed: requests.filter(r => r.status === 'Completed').length,
     };
 
-    // Live stock warning in the modal
+    
     const selectedStock = getStockForGroup(form.bloodGroup);
     const stockWarning = selectedStock < form.quantity;
 
     return (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-6xl mx-auto">
-            {/* Header */}
+            {}
             <motion.div variants={cardVariants} initial="hidden" animate="show" className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg">
@@ -163,7 +163,7 @@ export default function PatientDashboard() {
                 </div>
             </motion.div>
 
-            {/* Stats Cards */}
+            {}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
                     { label: 'Total Requests', value: stats.total, icon: Activity, color: 'from-blue-500 to-blue-600' },
@@ -188,7 +188,7 @@ export default function PatientDashboard() {
                 ))}
             </div>
 
-            {/* Tabs */}
+            {}
             <div className="flex flex-wrap gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
                 {['active', 'history', 'blood-availability'].map(tab => (
                     <button
@@ -201,7 +201,7 @@ export default function PatientDashboard() {
                 ))}
             </div>
 
-            {/* Active Requests Tab */}
+            {}
             {activeTab === 'active' && (() => {
                 const activeRequests = requests.filter(r => ['Pending', 'Approved', 'Donor Assigned'].includes(r.status));
                 return (
@@ -276,7 +276,7 @@ export default function PatientDashboard() {
                 );
             })()}
 
-            {/* History Requests Tab — only Rejected */}
+            {}
             {activeTab === 'history' && (() => {
                 const historyRequests = requests.filter(r => r.status === 'Rejected');
                 return (
@@ -327,7 +327,7 @@ export default function PatientDashboard() {
                 );
             })()}
 
-            {/* Blood Availability Tab */}
+            {}
             {activeTab === 'blood-availability' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <h2 className="text-lg font-bold text-gray-800 mb-4">Current Blood Stock</h2>
@@ -357,7 +357,7 @@ export default function PatientDashboard() {
                 </motion.div>
             )}
 
-            {/* Create Request Modal */}
+            {}
             {showModal && (
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
@@ -385,7 +385,7 @@ export default function PatientDashboard() {
                                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 focus:border-rose-400 outline-none">
                                         {BLOOD_GROUPS.map(bg => <option key={bg}>{bg}</option>)}
                                     </select>
-                                    {/* Live stock indicator */}
+                                    {}
                                     <div className={`mt-1 text-xs font-semibold ${selectedStock === 0 ? 'text-red-500' : selectedStock < 5 ? 'text-amber-500' : 'text-emerald-600'}`}>
                                         {selectedStock === 0 ? '⚠ No stock available' : selectedStock < 5 ? `⚡ Only ${selectedStock} units available` : `✓ ${selectedStock} units in stock`}
                                     </div>

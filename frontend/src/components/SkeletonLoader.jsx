@@ -1,5 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import PropTypes from 'prop-types';
 
 const SkeletonLoader = ({ count = 3, type = 'card' }) => {
     const skeletons = Array.from({ length: count });
@@ -49,6 +49,11 @@ const SkeletonLoader = ({ count = 3, type = 'card' }) => {
             ))}
         </div>
     );
+};
+
+SkeletonLoader.propTypes = {
+    count: PropTypes.number,
+    type: PropTypes.string,
 };
 
 export default SkeletonLoader;
