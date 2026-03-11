@@ -7,7 +7,7 @@ import {
     Plus, X, Calendar, Hospital, Phone, FileText, ChevronDown, Loader2, MapPin
 } from 'lucide-react';
 import {
-    fetchMyRequests, createRequest, cancelRequest, completeRequest,
+    fetchMyRequests, createRequest, cancelRequest,
     fetchBloodStock, resetPatient
 } from '../features/patient/patientSlice';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -44,6 +44,15 @@ const cardVariants = {
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
 };
 
+// Validation helpers
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+const isValidPhone = (phone) => /^\d{10}$/.test(phone.replace(/\D/g, ''));
+const isValidContact = (contact) => {
+    const trimmed = contact.trim();
+    if (trimmed.includes('@')) return isValidEmail(trimmed);
+    return isValidPhone(trimmed);
+};
+
 export default function PatientDashboard() {
     const dispatch = useDispatch();
     const { user } = useSelector((s) => s.auth);
@@ -71,11 +80,31 @@ export default function PatientDashboard() {
         }
     }, [isError, isSuccess, message, isLoading, dispatch]);
 
+    // Get current stock for selected blood group
+    const getStockForGroup = (group) => {
+        const item = bloodStock.find(s => s.bloodGroup === group);
+        return item ? item.unitsAvailable : 0;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!form.hospital || !form.requiredDate || !form.contactDetails) {
             toast.error('Please fill all required fields');
             return;
+        }
+        // Validate contact
+        if (!isValidContact(form.contactDetails)) {
+            toast.error('Enter a valid email or 10-digit phone number');
+            return;
+        }
+        // Blood stock alert
+        const available = getStockForGroup(form.bloodGroup);
+        if (available < form.quantity) {
+            toast(`⚠️ Blood stock for ${form.bloodGroup} is low (${available} units available). We will still process your request.`, {
+                icon: '⚠️',
+                style: { background: '#fff7ed', color: '#9a3412', border: '1px solid #fed7aa' },
+                duration: 5000,
+            });
         }
         dispatch(createRequest(form));
     };
@@ -85,17 +114,6 @@ export default function PatientDashboard() {
             dispatch(cancelRequest(id)).then(() => {
                 dispatch(fetchMyRequests());
                 toast.success('Request cancelled');
-            });
-        }
-    };
-
-    const handleComplete = (id) => {
-        if (window.confirm('Mark this request as completed? This confirms you have received the required blood.')) {
-            dispatch(completeRequest(id)).then((res) => {
-                if (!res.error) {
-                    dispatch(fetchMyRequests());
-                    toast.success('Request marked as completed');
-                }
             });
         }
     };
@@ -125,6 +143,10 @@ export default function PatientDashboard() {
         approved: requests.filter(r => ['Approved', 'Donor Assigned'].includes(r.status)).length,
         completed: requests.filter(r => r.status === 'Completed').length,
     };
+
+    // Live stock warning in the modal
+    const selectedStock = getStockForGroup(form.bloodGroup);
+    const stockWarning = selectedStock < form.quantity;
 
     return (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="max-w-6xl mx-auto">
@@ -236,13 +258,6 @@ export default function PatientDashboard() {
                                                         <X className="w-4 h-4" />
                                                     </button>
                                                 )}
-                                                {['Approved', 'Donor Assigned'].includes(req.status) && (
-                                                    <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                                                        onClick={() => handleComplete(req._id)}
-                                                        className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-colors shadow-sm">
-                                                        Mark Complete
-                                                    </motion.button>
-                                                )}
                                             </div>
                                         </div>
                                         {req.medicalReason && (
@@ -261,9 +276,9 @@ export default function PatientDashboard() {
                 );
             })()}
 
-            {/* History Requests Tab */}
+            {/* History Requests Tab — only Rejected */}
             {activeTab === 'history' && (() => {
-                const historyRequests = requests.filter(r => ['Completed', 'Rejected', 'Cancelled'].includes(r.status));
+                const historyRequests = requests.filter(r => r.status === 'Rejected');
                 return (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         <div className="flex justify-between items-center mb-4">
@@ -289,7 +304,7 @@ export default function PatientDashboard() {
                                     >
                                         <div className="flex flex-wrap items-start justify-between gap-3">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-extrabold text-lg shadow ${req.status === 'Completed' ? 'bg-emerald-500' : 'bg-gray-400'}`}>
+                                                <div className="w-12 h-12 rounded-xl bg-gray-400 flex items-center justify-center text-white font-extrabold text-lg shadow">
                                                     {req.bloodGroup}
                                                 </div>
                                                 <div>
@@ -370,12 +385,19 @@ export default function PatientDashboard() {
                                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 focus:border-rose-400 outline-none">
                                         {BLOOD_GROUPS.map(bg => <option key={bg}>{bg}</option>)}
                                     </select>
+                                    {/* Live stock indicator */}
+                                    <div className={`mt-1 text-xs font-semibold ${selectedStock === 0 ? 'text-red-500' : selectedStock < 5 ? 'text-amber-500' : 'text-emerald-600'}`}>
+                                        {selectedStock === 0 ? '⚠ No stock available' : selectedStock < 5 ? `⚡ Only ${selectedStock} units available` : `✓ ${selectedStock} units in stock`}
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">Quantity (units) *</label>
                                     <input type="number" min="1" value={form.quantity}
                                         onChange={e => setForm(f => ({ ...f, quantity: +e.target.value }))}
                                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 focus:border-rose-400 outline-none" />
+                                    {stockWarning && (
+                                        <div className="mt-1 text-xs font-semibold text-red-500">⚠ Requested quantity exceeds available stock</div>
+                                    )}
                                 </div>
                             </div>
                             <div>
@@ -412,9 +434,15 @@ export default function PatientDashboard() {
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-gray-600 mb-1.5"><Phone className="inline w-3.5 h-3.5 mr-1" />Contact Details *</label>
-                                <input type="text" value={form.contactDetails} placeholder="Phone / email"
+                                <input
+                                    type="text"
+                                    value={form.contactDetails}
+                                    placeholder="10-digit phone or email"
+                                    maxLength={100}
                                     onChange={e => setForm(f => ({ ...f, contactDetails: e.target.value }))}
-                                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 focus:border-rose-400 outline-none" />
+                                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-rose-300 focus:border-rose-400 outline-none"
+                                />
+                                <p className="text-[10px] text-gray-400 mt-1">Enter a 10-digit phone number or a valid email address</p>
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-gray-600 mb-1.5"><FileText className="inline w-3.5 h-3.5 mr-1" />Medical Reason</label>

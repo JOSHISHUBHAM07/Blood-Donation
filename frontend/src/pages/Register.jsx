@@ -25,7 +25,22 @@ const Register = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        dispatch(register(formData)).then((result) => {
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email.trim())) {
+            toast.error('Please enter a valid email address');
+            return;
+        }
+
+        // Phone validation — must be exactly 10 digits
+        const digitsOnly = formData.contact.replace(/\D/g, '');
+        if (digitsOnly.length !== 10) {
+            toast.error('Phone number must be exactly 10 digits');
+            return;
+        }
+
+        dispatch(register({ ...formData, contact: digitsOnly })).then((result) => {
             if (result.meta.requestStatus === 'fulfilled') {
                 toast.success('Registration successful! Welcome.');
                 const role = result.payload?.role;

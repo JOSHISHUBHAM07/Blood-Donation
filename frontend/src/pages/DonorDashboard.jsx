@@ -7,8 +7,8 @@ import {
     ToggleLeft, ToggleRight, Plus, X, MapPin
 } from 'lucide-react';
 import {
-    fetchAssignedRequests, fetchDonationHistory,
-    scheduleDonation, completeDonation, updateAvailability, resetDonor
+    fetchDonationHistory,
+    scheduleDonation, updateAvailability, resetDonor
 } from '../features/donor/donorSlice';
 import SkeletonLoader from '../components/SkeletonLoader';
 import MapLocator from '../components/MapLocator';
@@ -30,7 +30,7 @@ const cardVariants = {
 export default function DonorDashboard() {
     const dispatch = useDispatch();
     const { user } = useSelector(s => s.auth);
-    const { assignedRequests, donations, isLoading, isError, isSuccess, message } = useSelector(s => s.donor);
+    const { donations, isLoading, isError, isSuccess, message } = useSelector(s => s.donor);
 
     const [activeTab, setActiveTab] = useState('active');
     const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -38,7 +38,6 @@ export default function DonorDashboard() {
     const [form, setForm] = useState({ date: '', location: '', units: 1 });
 
     useEffect(() => {
-        dispatch(fetchAssignedRequests());
         dispatch(fetchDonationHistory());
     }, [dispatch]);
 
@@ -58,15 +57,6 @@ export default function DonorDashboard() {
         dispatch(updateAvailability(newVal)).then(() =>
             toast.success(`You are now ${newVal ? 'available' : 'unavailable'} for donation`)
         );
-    };
-
-    const handleComplete = (id) => {
-        if (window.confirm('Mark this donation as completed?')) {
-            dispatch(completeDonation(id)).then((res) => {
-                if (!res.error) toast.success('Donation completed! Blood stock updated.');
-                else toast.error(res.payload);
-            });
-        }
     };
 
     const handleSchedule = (e) => {
@@ -96,7 +86,7 @@ export default function DonorDashboard() {
         total: donations.length,
         completed: donations.filter(d => d.status === 'Completed').length,
         scheduled: donations.filter(d => d.status === 'Scheduled').length,
-        assigned: assignedRequests.length,
+        pending: donations.filter(d => d.status === 'Pending').length,
     };
 
     return (
@@ -128,7 +118,7 @@ export default function DonorDashboard() {
                     { label: 'Total Donations', value: stats.total, icon: Heart, color: 'from-rose-500 to-pink-500' },
                     { label: 'Completed', value: stats.completed, icon: CheckCircle2, color: 'from-emerald-500 to-green-500' },
                     { label: 'Scheduled', value: stats.scheduled, icon: Clock, color: 'from-blue-500 to-blue-600' },
-                    { label: 'Assigned Requests', value: stats.assigned, icon: AlertCircle, color: 'from-purple-500 to-purple-600' },
+                    { label: 'Pending', value: stats.pending, icon: AlertCircle, color: 'from-amber-400 to-amber-500' },
                 ].map((s, i) => (
                     <motion.div key={i} variants={cardVariants} custom={i} initial="hidden" animate="show"
                         className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -143,10 +133,10 @@ export default function DonorDashboard() {
 
             {/* Tabs */}
             <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit flex-wrap">
-                {['active', 'history', 'assigned'].map(tab => (
+                {['active', 'history'].map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)}
                         className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-                        {tab === 'active' ? '💉 Active Donations' : tab === 'history' ? '🕰️ History' : '📋 Assigned Requests'}
+                        {tab === 'active' ? '💉 Active Donations' : '🕰️ History'}
                     </button>
                 ))}
             </div>
@@ -193,13 +183,6 @@ export default function DonorDashboard() {
                                                 </div>
                                             </div>
                                         </div>
-                                        {['Scheduled', 'Approved'].includes(d.status) && (
-                                            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                                                onClick={() => handleComplete(d._id)}
-                                                className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors shadow-sm">
-                                                Mark Complete
-                                            </motion.button>
-                                        )}
                                     </motion.div>
                                 ))}
                             </div>
@@ -208,9 +191,9 @@ export default function DonorDashboard() {
                 );
             })()}
 
-            {/* Donation History */}
+            {/* Donation History — only Rejected */}
             {activeTab === 'history' && (() => {
-                const historyDonations = donations.filter(d => ['Completed', 'Rejected', 'Cancelled'].includes(d.status));
+                const historyDonations = donations.filter(d => d.status === 'Rejected');
                 return (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         <div className="flex justify-between items-center mb-4">
@@ -231,8 +214,8 @@ export default function DonorDashboard() {
                                         transition={{ delay: i * 0.05 }}
                                         className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-wrap items-center justify-between gap-3 opacity-80">
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm ${d.status === 'Completed' ? 'bg-emerald-50' : 'bg-gray-50'}`}>
-                                                {d.status === 'Completed' ? '✅' : '❌'}
+                                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm bg-gray-50">
+                                                ❌
                                             </div>
                                             <div>
                                                 <div className="font-bold text-gray-800 flex items-center gap-2">
@@ -251,47 +234,6 @@ export default function DonorDashboard() {
                     </motion.div>
                 );
             })()}
-
-            {/* Assigned Requests */}
-            {activeTab === 'assigned' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    <h2 className="text-lg font-bold text-gray-800 mb-4">Assigned Blood Requests</h2>
-                    {assignedRequests.length === 0 ? (
-                        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
-                            <AlertCircle className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                            <p className="text-gray-400 font-medium">No requests assigned yet</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {assignedRequests.map((req, i) => (
-                                <motion.div key={req._id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: i * 0.05 }}
-                                    className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all">
-                                    <div className="flex flex-wrap items-center justify-between gap-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white font-extrabold text-lg shadow">
-                                                {req.bloodGroup}
-                                            </div>
-                                            <div>
-                                                <div className="font-bold text-gray-800">{req.hospital}</div>
-                                                <div className="text-sm text-gray-500">{req.quantity} unit(s) · Needed by {new Date(req.requiredDate).toLocaleDateString()}</div>
-                                            </div>
-                                        </div>
-                                        <span className={`px-3 py-1 rounded-lg text-xs font-bold ${req.emergencyLevel === 'Critical' ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-orange-100 text-orange-700'}`}>
-                                            {req.emergencyLevel}
-                                        </span>
-                                    </div>
-                                    {req.patientId && (
-                                        <div className="mt-3 text-sm text-blue-700 bg-blue-50 rounded-xl px-3 py-2">
-                                            Patient: <strong>{req.patientId.name}</strong> · {req.patientId.contact}
-                                        </div>
-                                    )}
-                                </motion.div>
-                            ))}
-                        </div>
-                    )}
-                </motion.div>
-            )}
 
             {/* Schedule Donation Modal */}
             <AnimatePresence>
