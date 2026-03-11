@@ -132,6 +132,28 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleMarkComplete = (id, type) => {
+        if (type === 'donation') {
+            dispatch(updateDonationStatus({ id, status: 'Completed' }))
+                .then(res => {
+                    if (!res.error) {
+                        toast.success('Donation marked as completed');
+                        dispatch(fetchDonations());
+                        dispatch(fetchDashboard());
+                    } else toast.error(res.payload);
+                });
+        } else {
+            dispatch(updateRequestStatus({ id, status: 'Completed' }))
+                .then(res => {
+                    if (!res.error) {
+                        toast.success('Request marked as completed');
+                        dispatch(fetchRequests());
+                        dispatch(fetchDashboard());
+                    } else toast.error(res.payload);
+                });
+        }
+    };
+
     const handleUpdateStock = (bg) => {
         const val = parseInt(editStock[bg]);
         if (isNaN(val) || val < 0) { toast.error('Enter a valid number'); return; }
@@ -291,10 +313,17 @@ export default function AdminDashboard() {
                                                     P:{req.priorityScore}
                                                 </span>
                                             )}
+                                            {req.status === 'Approved' && (
+                                                <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                                    onClick={() => handleMarkComplete(req._id, 'request')}
+                                                    className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm ml-1 flex items-center gap-1">
+                                                    <CheckCircle className="w-3.5 h-3.5" /> Mark Complete
+                                                </motion.button>
+                                            )}
                                             {req.status !== 'Completed' && !['Cancelled', 'Rejected'].includes(req.status) && (
                                                 <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                                                     onClick={() => { setStatusModal({ requestId: req._id, currentStatus: req.status, type: 'request' }); setNewStatus('Approved'); setStatusNote(''); setDonorIdInput(''); }}
-                                                    className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm">
+                                                    className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm ml-1">
                                                     Update
                                                 </motion.button>
                                             )}
@@ -355,11 +384,17 @@ export default function AdminDashboard() {
                                         </div>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${statusColors[don.status] || 'bg-gray-100 text-gray-600'}`}>{don.status}</span>
-
+                                            {don.status === 'Approved' && (
+                                                <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                                                    onClick={() => handleMarkComplete(don._id, 'donation')}
+                                                    className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm ml-1 flex items-center gap-1">
+                                                    <CheckCircle className="w-3.5 h-3.5" /> Mark Complete
+                                                </motion.button>
+                                            )}
                                             {don.status !== 'Completed' && !['Cancelled', 'Rejected'].includes(don.status) && (
                                                 <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                                                     onClick={() => { setStatusModal({ requestId: don._id, currentStatus: don.status, type: 'donation' }); setNewStatus('Approved'); }}
-                                                    className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm">
+                                                    className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors shadow-sm ml-1">
                                                     Update
                                                 </motion.button>
                                             )}
