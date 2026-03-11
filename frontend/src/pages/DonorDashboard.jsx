@@ -80,6 +80,8 @@ export default function DonorDashboard() {
         } catch {
             setForm(f => ({ ...f, location: `${loc.lat.toFixed(4)},${loc.lng.toFixed(4)}` }));
         }
+    };
+
     const stats = {
         total: donations.length,
         completed: donations.filter(d => d.status === 'Completed').length,

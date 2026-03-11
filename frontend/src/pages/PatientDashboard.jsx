@@ -135,6 +135,8 @@ export default function PatientDashboard() {
         } catch {
             // Silently ignore geocoding errors – user can still type manually
         }
+    };
+
     const stats = {
         total: requests.length,
         pending: requests.filter(r => r.status === 'Pending').length,
