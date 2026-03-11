@@ -34,7 +34,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="glass-nav z-0">
+        <nav className="glass-nav sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex justify-between items-center h-16">
                     {}
@@ -121,7 +121,7 @@ const Navbar = () => {
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        className="md:hidden bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-xl overflow-hidden absolute top-16 left-0 w-full"
+                        className="md:hidden bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-xl overflow-hidden absolute top-16 left-0 w-full z-40"
                     >
                         <div className="px-4 py-5 space-y-2 flex flex-col">
                             {user ? (

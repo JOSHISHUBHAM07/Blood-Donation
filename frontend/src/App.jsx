@@ -73,11 +73,12 @@ function App() {
     <Router>
       <div className="flex flex-col min-h-screen text-gray-900 font-sans relative">
         <BackgroundBlobs />
-        <div className="relative z-[5]"><Navbar /></div>
+        <Navbar />
         <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
           <AnimatedRoutes />
         </main>
-        <div className="relative z-[5]"><Footer /></div>
+        <Footer />
+        <div className="fixed top-0 right-0 z-[9999] pointer-events-none">
         <Toaster
           position="top-right"
           toastOptions={{
@@ -87,6 +88,7 @@ function App() {
             error: { iconTheme: { primary: '#f87171', secondary: '#fff' } },
           }}
         />
+        </div>
       </div>
     </Router>
   );

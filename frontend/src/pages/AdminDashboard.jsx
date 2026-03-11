@@ -215,7 +215,8 @@ export default function AdminDashboard() {
             </motion.div>
 
             {}
-            <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl flex-wrap">
+            <div className="flex overflow-x-auto gap-2 mb-6 scrollbar-hide pb-1">
+                <div className="flex gap-2 bg-gray-100 p-1 rounded-xl flex-shrink-0 min-w-fit">
                 {[
                     { key: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
                     { key: 'requests', icon: ClipboardList, label: 'Requests' },
@@ -225,10 +226,11 @@ export default function AdminDashboard() {
                     { key: 'audit', icon: Shield, label: 'Audit Logs' },
                 ].map(({ key, icon: Icon, label }) => (
                     <button key={key} onClick={() => setActiveTab(key)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === key ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${activeTab === key ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
                         <Icon className="w-4 h-4" />{label}
                     </button>
                 ))}
+                </div>
             </div>
 
             {}
@@ -579,7 +581,7 @@ export default function AdminDashboard() {
             <AnimatePresence>
                 {statusModal && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+                        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
                         onClick={e => e.target === e.currentTarget && setStatusModal(null)}>
                         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
                             className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
