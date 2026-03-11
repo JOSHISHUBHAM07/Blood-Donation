@@ -372,20 +372,10 @@ const LandingPage = () => {
                 </h2>
 
                 <p className="text-xl text-gray-500 leading-relaxed max-w-3xl mx-auto mb-10">
-                    Life Flow is a community-driven blood management system developed using the{' '}
-                    <span className="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-lg">MERN Stack</span>.{' '}
+                    Life Flow is a community-driven blood management system.
                     Our mission is to bridge the gap between blood donors and patients in need —
                     making every drop count.
                 </p>
-
-                {/* Tech stack pills */}
-                <div className="flex flex-wrap justify-center gap-3 mb-12">
-                    {['MongoDB', 'Express.js', 'React', 'Node.js', 'Redux', 'Tailwind CSS'].map((tech) => (
-                        <span key={tech} className="px-4 py-1.5 rounded-full bg-gray-100 text-gray-600 text-sm font-semibold border border-gray-200 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-colors">
-                            {tech}
-                        </span>
-                    ))}
-                </div>
 
                 <Link
                     to="/register"
