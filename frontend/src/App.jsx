@@ -25,7 +25,7 @@ const ScrollToTop = () => {
 
 
 const BackgroundBlobs = () => (
-  <div className="fixed inset-0 pointer-events-none z-0">
+  <div className="fixed inset-0 pointer-events-none -z-10">
     <motion.div
       animate={{ scale: [1, 1.2, 1], x: [0, 100, 0], y: [0, -50, 0] }}
       transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
@@ -74,7 +74,7 @@ function App() {
       <div className="flex flex-col min-h-screen text-gray-900 font-sans relative">
         <BackgroundBlobs />
         <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
+        <main className="flex-grow container mx-auto px-4 py-8 relative">
           <AnimatedRoutes />
         </main>
         <Footer />
