@@ -199,6 +199,27 @@ const updateDonationStatus = async (req, res) => {
         const oldStatus = donation.status;
         donation.status = status || donation.status;
 
+        // Auto-update stock if donation is completed
+        if (status === 'Completed' && oldStatus !== 'Completed') {
+            const donor = await User.findById(donation.donorId);
+            if (donor && donor.bloodGroup) {
+                let stock = await BloodStock.findOne({ bloodGroup: donor.bloodGroup });
+                if (stock) {
+                    stock.unitsAvailable += donation.units;
+                    await stock.save();
+                    logger.info(`Stock updated via admin: ${donor.bloodGroup} +${donation.units} units`);
+                } else {
+                    await BloodStock.create({ bloodGroup: donor.bloodGroup, unitsAvailable: donation.units });
+                    logger.info(`Stock created via admin: ${donor.bloodGroup} with ${donation.units} units`);
+                }
+
+                // Also update donor's last donation date and availability
+                donor.lastDonationDate = new Date();
+                donor.isAvailable = false;
+                await donor.save();
+            }
+        }
+
         const updatedDonation = await donation.save();
 
         

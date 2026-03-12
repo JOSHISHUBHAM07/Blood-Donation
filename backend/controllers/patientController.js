@@ -34,6 +34,14 @@ const createBloodRequest = async (req, res) => {
     const { bloodGroup, quantity, hospital, requiredDate, emergencyLevel, contactDetails, medicalReason } = req.body;
 
     try {
+        
+        const stock = await BloodStock.findOne({ bloodGroup });
+        if (!stock || stock.unitsAvailable < quantity) {
+            return res.status(400).json({ 
+                message: `Insufficient stock for ${bloodGroup}. Available: ${stock ? stock.unitsAvailable : 0} units, Requested: ${quantity} units.` 
+            });
+        }
+
         const priorityScore = await computePriorityScore(emergencyLevel, requiredDate, bloodGroup);
 
         const request = await Request.create({
