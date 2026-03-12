@@ -100,7 +100,7 @@ const getAllRequests = async (req, res) => {
         const requests = await Request.find({})
             .populate('patientId', 'name email contact bloodGroup')
             .populate('assignedDonorId', 'name email contact bloodGroup')
-            .sort({ priorityScore: -1, createdAt: -1 });
+            .sort({ createdAt: -1 });
         res.json(requests);
     } catch (error) {
         logger.error(`getAllRequests error: ${error.message}`);

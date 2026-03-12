@@ -305,11 +305,6 @@ export default function AdminDashboard() {
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${emergencyColors[req.emergencyLevel]}`}>{req.emergencyLevel}</span>
                                             <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${statusColors[req.status] || 'bg-gray-100 text-gray-600'}`}>{req.status}</span>
-                                            {req.priorityScore > 0 && (
-                                                <span className={`px-2 py-0.5 rounded-lg text-xs font-extrabold ${req.priorityScore >= 70 ? 'bg-red-500 text-white' : req.priorityScore >= 50 ? 'bg-orange-400 text-white' : 'bg-gray-200 text-gray-700'}`}>
-                                                    P:{req.priorityScore}
-                                                </span>
-                                            )}
                                             {req.status === 'Approved' && (
                                                 <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                                                     onClick={() => handleMarkComplete(req._id, 'request')}

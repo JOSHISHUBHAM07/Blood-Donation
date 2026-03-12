@@ -32,13 +32,6 @@ const emergencyColors = {
     Critical: 'text-red-600 bg-red-50 animate-pulse',
 };
 
-const priorityBadge = (score) => {
-    if (score >= 70) return 'bg-red-500 text-white';
-    if (score >= 50) return 'bg-orange-400 text-white';
-    if (score >= 30) return 'bg-yellow-400 text-gray-900';
-    return 'bg-gray-200 text-gray-700';
-};
-
 const cardVariants = {
     hidden: { opacity: 0, y: 24 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
@@ -98,14 +91,6 @@ export default function PatientDashboard() {
             return;
         }
         
-        const available = getStockForGroup(form.bloodGroup);
-        if (available < form.quantity) {
-            toast(`⚠️ Blood stock for ${form.bloodGroup} is low (${available} units available). We will still process your request.`, {
-                icon: '⚠️',
-                style: { background: '#fff7ed', color: '#9a3412', border: '1px solid #fed7aa' },
-                duration: 5000,
-            });
-        }
         dispatch(createRequest(form));
     };
 
@@ -250,11 +235,6 @@ export default function PatientDashboard() {
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${emergencyColors[req.emergencyLevel]}`}>{req.emergencyLevel}</span>
                                                 <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${statusColors[req.status] || 'bg-gray-100 text-gray-600'}`}>{req.status}</span>
-                                                {req.priorityScore > 0 && (
-                                                    <span className={`px-2.5 py-1 rounded-lg text-xs font-extrabold ${priorityBadge(req.priorityScore)}`}>
-                                                        Score: {req.priorityScore}
-                                                    </span>
-                                                )}
                                                 {req.status === 'Pending' && (
                                                     <button onClick={() => handleCancel(req._id)} className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors" title="Cancel">
                                                         <X className="w-4 h-4" />

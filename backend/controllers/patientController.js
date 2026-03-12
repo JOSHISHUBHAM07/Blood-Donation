@@ -8,28 +8,6 @@ const { sendEmail, generateUrgentRequestEmail } = require('../utils/emailService
 
 
 
-const computePriorityScore = async (emergencyLevel, requiredDate, bloodGroup) => {
-    let score = 0;
-
-    
-    const emergencyWeights = { Critical: 40, High: 30, Medium: 20, Low: 10 };
-    score += emergencyWeights[emergencyLevel] || 10;
-
-    
-    const daysUntilRequired = Math.ceil((new Date(requiredDate) - new Date()) / (1000 * 60 * 60 * 24));
-    if (daysUntilRequired <= 1) score += 30;
-    else if (daysUntilRequired <= 3) score += 20;
-    else if (daysUntilRequired <= 7) score += 10;
-
-    
-    const stock = await BloodStock.findOne({ bloodGroup });
-    const units = stock ? stock.unitsAvailable : 0;
-    if (units === 0) score += 20;
-    else if (units < 5) score += 10;
-
-    return score;
-};
-
 const createBloodRequest = async (req, res) => {
     const { bloodGroup, quantity, hospital, requiredDate, emergencyLevel, contactDetails, medicalReason } = req.body;
 
@@ -42,8 +20,6 @@ const createBloodRequest = async (req, res) => {
             });
         }
 
-        const priorityScore = await computePriorityScore(emergencyLevel, requiredDate, bloodGroup);
-
         const request = await Request.create({
             patientId: req.user._id,
             bloodGroup,
@@ -53,10 +29,9 @@ const createBloodRequest = async (req, res) => {
             emergencyLevel,
             contactDetails,
             medicalReason,
-            priorityScore,
         });
 
-        logger.info(`Blood request created by ${req.user.email}: ${bloodGroup} (priority: ${priorityScore})`);
+        logger.info(`Blood request created by ${req.user.email}: ${bloodGroup}`);
 
         
         if (['High', 'Critical'].includes(emergencyLevel)) {

@@ -57,10 +57,6 @@ const requestSchema = new mongoose.Schema({
         type: String
     },
     
-    priorityScore: {
-        type: Number,
-        default: 0
-    },
     approvalLogs: [approvalLogSchema],
 }, { timestamps: true });
 
@@ -68,7 +64,6 @@ const requestSchema = new mongoose.Schema({
 requestSchema.index({ bloodGroup: 1 });
 requestSchema.index({ status: 1 });
 requestSchema.index({ createdAt: -1 });
-requestSchema.index({ priorityScore: -1 });
 requestSchema.index({ patientId: 1 });
 
 module.exports = mongoose.model('Request', requestSchema);
