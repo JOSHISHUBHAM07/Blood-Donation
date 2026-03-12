@@ -421,7 +421,7 @@ export default function AdminDashboard() {
                             <Download className="w-4 h-4" /> Export CSV
                         </button>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {BLOOD_GROUPS.map(bg => {
                             const item = stock.find(s => s.bloodGroup === bg);
                             const units = item ? item.unitsAvailable : 0;

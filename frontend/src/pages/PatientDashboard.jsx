@@ -260,7 +260,7 @@ export default function PatientDashboard() {
 
             {}
             {activeTab === 'history' && (() => {
-                const historyRequests = requests.filter(r => r.status === 'Rejected');
+                const historyRequests = requests.filter(r => ['Completed', 'Cancelled', 'Rejected'].includes(r.status));
                 return (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         <div className="flex justify-between items-center mb-4">
@@ -286,7 +286,7 @@ export default function PatientDashboard() {
                                     >
                                         <div className="flex flex-wrap items-start justify-between gap-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-xl bg-gray-400 flex items-center justify-center text-white font-extrabold text-lg shadow">
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-extrabold text-lg shadow ${req.status === 'Completed' ? 'bg-gradient-to-br from-emerald-500 to-green-600' : req.status === 'Cancelled' ? 'bg-gradient-to-br from-gray-400 to-gray-500' : 'bg-gradient-to-br from-red-500 to-rose-600'}`}>
                                                     {req.bloodGroup}
                                                 </div>
                                                 <div>
@@ -313,7 +313,7 @@ export default function PatientDashboard() {
             {activeTab === 'blood-availability' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <h2 className="text-lg font-bold text-gray-800 mb-4">Current Blood Stock</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {BLOOD_GROUPS.map(bg => {
                             const item = bloodStock.find(s => s.bloodGroup === bg);
                             const units = item ? item.unitsAvailable : 0;
