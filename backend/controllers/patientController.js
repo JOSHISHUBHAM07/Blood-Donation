@@ -127,11 +127,14 @@ const completeRequest = async (req, res) => {
         
         if (oldStatus !== 'Completed') {
             const stock = await BloodStock.findOne({ bloodGroup: request.bloodGroup });
-            if (stock && oldStatus === 'Approved') {
+            if (oldStatus === 'Approved' || oldStatus === 'Donor Assigned') {
+                if (!stock) {
+                    return res.status(400).json({ message: `Insufficient stock for ${request.bloodGroup}. Available: 0 units.` });
+                }
                 if (stock.unitsAvailable < request.quantity) {
                     return res.status(400).json({ message: `Insufficient stock for ${request.bloodGroup}. Available: ${stock.unitsAvailable} units.` });
                 }
-                stock.unitsAvailable = Math.max(0, stock.unitsAvailable - request.quantity);
+                stock.unitsAvailable -= request.quantity;
                 await stock.save();
                 logger.info(`Blood stock deducted on patient complete: ${request.bloodGroup} -${request.quantity} units`);
             }
