@@ -5,6 +5,7 @@ const Request = require('./models/Request');
 const Donation = require('./models/Donation');
 const BloodStock = require('./models/BloodStock');
 const AuditLog = require('./models/AuditLog');
+const User = require('./models/User');
 
 const clearDB = async () => {
     try {
@@ -24,7 +25,14 @@ const clearDB = async () => {
         await AuditLog.deleteMany({});
         console.log('Cleared AuditLogs');
 
-        console.log('Successfully cleared all data except Users.');
+        await User.deleteMany({
+            email: {
+                $nin: ['testa123@gmail.com', 'testd123@gmail.com', 'testp123@gmail.com']
+            }
+        });
+        console.log('Cleared Users except test accounts');
+
+        console.log('Successfully cleared database.');
         process.exit();
     } catch (error) {
         console.error('Error clearing DB:', error);
